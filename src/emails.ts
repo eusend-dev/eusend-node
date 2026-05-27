@@ -1,5 +1,6 @@
 import type { Eusend } from './eusend';
 import type { EusendResponse } from './interfaces';
+import { renderReactEmail, type ReactEmailElement } from './react-render';
 
 export type EmailStatus =
   | 'queued'
@@ -28,6 +29,12 @@ export interface SendEmailOptions {
   subject?: string;
   html?: string;
   text?: string;
+  /**
+   * A React Email component. The SDK renders it to HTML locally before sending
+   * — the JSX source never travels over the wire. Requires `@react-email/render`
+   * and `react` as peer dependencies. Ignored when `html` is also provided.
+   */
+  react?: ReactEmailElement;
   templateId?: string;
   variables?: Record<string, unknown>;
   headers?: Record<string, string>;
@@ -94,7 +101,14 @@ export interface ListEmailsResponse {
   nextCursor: string | null;
 }
 
-function toApiPayload(options: SendEmailOptions) {
+async function resolveHtml(options: SendEmailOptions): Promise<string | undefined> {
+  if (options.html) return options.html;
+  if (options.react) return renderReactEmail(options.react);
+  return undefined;
+}
+
+async function toApiPayload(options: SendEmailOptions) {
+  const html = await resolveHtml(options);
   return {
     from: options.from,
     to: options.to,
@@ -102,7 +116,7 @@ function toApiPayload(options: SendEmailOptions) {
     bcc: options.bcc,
     reply_to: options.replyTo,
     subject: options.subject,
-    html: options.html,
+    html,
     text: options.text,
     template_id: options.templateId,
     variables: options.variables,
@@ -123,14 +137,16 @@ export class Emails {
     if (requestOptions?.idempotencyKey) {
       extraHeaders['Idempotency-Key'] = requestOptions.idempotencyKey;
     }
-    return this.client.post<SendEmailResponse>('/emails', toApiPayload(options), extraHeaders);
+    const payload = await toApiPayload(options);
+    return this.client.post<SendEmailResponse>('/emails', payload, extraHeaders);
   }
 
   async batch(
     emails: SendEmailOptions[],
   ): Promise<EusendResponse<BatchSendResponse>> {
+    const payloads = await Promise.all(emails.map(toApiPayload));
     return this.client.post<BatchSendResponse>('/emails/batch', {
-      emails: emails.map(toApiPayload),
+      emails: payloads,
     });
   }
 

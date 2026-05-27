@@ -60,7 +60,33 @@ console.log(data?.id) // em_...
 | `trackOpens` | `boolean` | Track open events (default: `true`) |
 | `trackClicks` | `boolean` | Track click events (default: `true`) |
 
-At least one of `html`, `text`, or `templateId` is required.
+At least one of `html`, `react`, `text`, or `templateId` is required.
+
+### Send with React Email
+
+Pass a React Email component via the `react` field. The SDK renders it to HTML locally before sending — the JSX source never travels over the wire.
+
+```tsx
+import { Eusend } from '@eusend_dev/sdk'
+import { WelcomeEmail } from './emails/welcome'
+
+const client = new Eusend()
+
+await client.emails.send({
+  from: 'hello@yourdomain.com',
+  to: 'user@example.com',
+  subject: 'Welcome',
+  react: <WelcomeEmail name="Jane" />,
+})
+```
+
+Requires `react` and `@react-email/render` as peer dependencies:
+
+```bash
+npm install react @react-email/render
+```
+
+If you prefer to render yourself, pass the resulting HTML via `html` instead — useful when you want one rendered template to serve multiple sends.
 
 ### Idempotent sends
 
@@ -329,30 +355,21 @@ const { data } = await client.templates.create({
 })
 ```
 
-### Create a template (React)
+### Create a template (React Email)
 
-Pass JSX using `@react-email/components`. The server renders it to email-safe HTML at save time, with `{{variable}}` placeholders preserved for send-time substitution.
+Pass a React Email component via `react`. The SDK renders it to HTML locally before submitting — the JSX source never travels over the wire.
 
-```ts
+```tsx
+import { OrderConfirmation } from './emails/order-confirmation'
+
 const { data } = await client.templates.create({
   name: 'Order confirmation',
   subject: 'Your order {{order_id}} is confirmed',
-  reactSource: `
-<Html>
-  <Head />
-  <Preview>Order {{order_id}} confirmed</Preview>
-  <Body style={{ backgroundColor: '#f4f4f5', fontFamily: 'system-ui, sans-serif' }}>
-    <Container style={{ maxWidth: '520px', margin: '40px auto', backgroundColor: '#fff', borderRadius: '8px' }}>
-      <Section style={{ padding: '32px' }}>
-        <Heading>Order confirmed ✓</Heading>
-        <Text>Hi {{first_name}}, your order <strong>{{order_id}}</strong> is on its way.</Text>
-        <Button href="https://yourapp.com/orders/{{order_id}}">View order</Button>
-      </Section>
-    </Container>
-  </Body>
-</Html>`,
+  react: <OrderConfirmation />,
 })
 ```
+
+Use `{{variable}}` placeholders anywhere in your React component; they pass through to the rendered HTML and are substituted at send time when you provide `variables`. If you'd rather render yourself, pass `html` instead.
 
 ### Send using a template
 
@@ -443,6 +460,20 @@ const { data } = await client.broadcasts.create({
   from: 'Sivert <hello@yourdomain.com>',
   subject: 'May update',
   html: '<p>Hi {{first_name}}, here is this month's update...</p>',
+})
+```
+
+You can also pass a React Email component via `react`, a saved template via `templateId`, or plain HTML. With `react`, the SDK renders to HTML locally before submitting:
+
+```tsx
+import { MayNewsletter } from './emails/may-newsletter'
+
+await client.broadcasts.create({
+  name: 'May newsletter',
+  audienceId: 'aud_...',
+  from: 'Sivert <hello@yourdomain.com>',
+  subject: 'May update',
+  react: <MayNewsletter />,
 })
 ```
 

@@ -1,18 +1,26 @@
 import type { Eusend } from './eusend';
 import type { EusendResponse } from './interfaces';
+import { renderReactEmail, type ReactEmailElement } from './react-render';
 
-export interface CreateTemplateOptions {
+interface TemplateHtmlOrReact {
+  /**
+   * A React Email component. The SDK renders it to HTML locally before sending.
+   * Requires `@react-email/render` and `react` as peer dependencies.
+   * Ignored when `html` is also provided.
+   */
+  react?: ReactEmailElement;
+}
+
+export interface CreateTemplateOptions extends TemplateHtmlOrReact {
   name: string;
   subject: string;
   html?: string;
-  reactSource?: string;
 }
 
-export interface UpdateTemplateOptions {
+export interface UpdateTemplateOptions extends TemplateHtmlOrReact {
   name?: string;
   subject?: string;
   html?: string;
-  reactSource?: string;
 }
 
 export interface Template {
@@ -33,15 +41,34 @@ export interface TemplateListItem {
   updatedAt: string;
 }
 
+async function resolveTemplateHtml(
+  options: TemplateHtmlOrReact & { html?: string },
+): Promise<string | undefined> {
+  if (options.html) return options.html;
+  if (options.react) return renderReactEmail(options.react);
+  return undefined;
+}
+
 export class Templates {
   constructor(private readonly client: Eusend) {}
 
-  create(options: CreateTemplateOptions): Promise<EusendResponse<Template>> {
+  async create(options: CreateTemplateOptions): Promise<EusendResponse<Template>> {
+    const html = await resolveTemplateHtml(options);
+    if (!html) {
+      return {
+        data: null,
+        error: {
+          message: 'Either html or react is required',
+          statusCode: null,
+          name: 'VALIDATION_ERROR',
+        },
+        headers: null,
+      };
+    }
     return this.client.post<Template>('/templates', {
       name: options.name,
       subject: options.subject,
-      html: options.html,
-      react_source: options.reactSource,
+      html,
     });
   }
 
@@ -55,12 +82,12 @@ export class Templates {
     return this.client.get<Template>(`/templates/${id}`);
   }
 
-  update(id: string, options: UpdateTemplateOptions): Promise<EusendResponse<Template>> {
+  async update(id: string, options: UpdateTemplateOptions): Promise<EusendResponse<Template>> {
+    const html = await resolveTemplateHtml(options);
     return this.client.patch<Template>(`/templates/${id}`, {
       name: options.name,
       subject: options.subject,
-      html: options.html,
-      react_source: options.reactSource,
+      html,
     });
   }
 
