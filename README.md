@@ -508,6 +508,7 @@ if (error) {
 | `MONTHLY_LIMIT_EXCEEDED` | 429 | Monthly send quota reached |
 | `DAILY_LIMIT_EXCEEDED` | 429 | Daily send quota reached (free plan) |
 | `PLAN_LIMIT_EXCEEDED` | 403 | Feature not available on your plan |
+| `DOMAIN_NOT_VERIFIED` | 403 | The sender domain is not verified for your organisation |
 | `ALL_SUPPRESSED` | 422 | All recipients are on the suppression list |
 | `INTERNAL_ERROR` | 500 | Server error |
 | `application_error` | `null` | Network failure — request never reached the server |
