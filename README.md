@@ -47,10 +47,10 @@ console.log(data?.id) // em_...
 | Field | Type | Description |
 |-------|------|-------------|
 | `from` | `string` | Sender email address |
-| `to` | `string \| string[]` | Recipient(s) |
-| `cc` | `string \| string[]` | CC recipient(s) |
-| `bcc` | `string \| string[]` | BCC recipient(s) |
-| `replyTo` | `string \| string[]` | Reply-to address(es) |
+| `to` | `string \| string[]` | Recipient(s). Maximum 50. |
+| `cc` | `string \| string[]` | CC recipient(s). Maximum 50. |
+| `bcc` | `string \| string[]` | BCC recipient(s). Maximum 50. |
+| `replyTo` | `string \| string[]` | Reply-to address(es). Maximum 50. |
 | `subject` | `string` | Email subject |
 | `html` | `string` | HTML body |
 | `text` | `string` | Plain text body |
