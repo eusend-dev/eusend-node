@@ -1,49 +1,49 @@
-import type { EusendError, EusendResponse } from './interfaces';
-import { Emails } from './emails';
-import { Domains } from './domains';
-import { ApiKeys } from './api-keys';
-import { Audiences } from './audiences';
-import { Templates } from './templates';
-import { Webhooks } from './webhooks';
-import { Broadcasts } from './broadcasts';
+import type { EusendError, EusendResponse } from './interfaces'
+import { Emails } from './emails'
+import { Domains } from './domains'
+import { ApiKeys } from './api-keys'
+import { Audiences } from './audiences'
+import { Templates } from './templates'
+import { Webhooks } from './webhooks'
+import { Broadcasts } from './broadcasts'
 
-const DEFAULT_BASE_URL = 'https://api.eusend.dev';
-const SDK_VERSION = '0.3.2';
+const DEFAULT_BASE_URL = 'https://api.eusend.dev'
+const SDK_VERSION = '0.3.3'
 
 export interface EusendOptions {
-  baseUrl?: string;
+  baseUrl?: string
 }
 
 export class Eusend {
-  readonly baseUrl: string;
-  private readonly apiKey: string;
+  readonly baseUrl: string
+  private readonly apiKey: string
 
-  readonly emails: Emails;
-  readonly domains: Domains;
-  readonly apiKeys: ApiKeys;
-  readonly audiences: Audiences;
-  readonly templates: Templates;
-  readonly webhooks: Webhooks;
-  readonly broadcasts: Broadcasts;
+  readonly emails: Emails
+  readonly domains: Domains
+  readonly apiKeys: ApiKeys
+  readonly audiences: Audiences
+  readonly templates: Templates
+  readonly webhooks: Webhooks
+  readonly broadcasts: Broadcasts
 
   constructor(key?: string, options?: EusendOptions) {
     const apiKey =
-      key ?? (typeof process !== 'undefined' ? process.env['EUSEND_API_KEY'] : undefined);
+      key ?? (typeof process !== 'undefined' ? process.env['EUSEND_API_KEY'] : undefined)
     if (!apiKey) {
       throw new Error(
         'Missing Eusend API key. Pass it to the constructor or set the EUSEND_API_KEY environment variable.',
-      );
+      )
     }
-    this.apiKey = apiKey;
-    this.baseUrl = options?.baseUrl ?? DEFAULT_BASE_URL;
+    this.apiKey = apiKey
+    this.baseUrl = options?.baseUrl ?? DEFAULT_BASE_URL
 
-    this.emails = new Emails(this);
-    this.domains = new Domains(this);
-    this.apiKeys = new ApiKeys(this);
-    this.audiences = new Audiences(this);
-    this.templates = new Templates(this);
-    this.webhooks = new Webhooks(this);
-    this.broadcasts = new Broadcasts(this);
+    this.emails = new Emails(this)
+    this.domains = new Domains(this)
+    this.apiKeys = new ApiKeys(this)
+    this.audiences = new Audiences(this)
+    this.templates = new Templates(this)
+    this.webhooks = new Webhooks(this)
+    this.broadcasts = new Broadcasts(this)
   }
 
   async fetchRequest<T>(
@@ -56,33 +56,33 @@ export class Eusend {
       'Content-Type': 'application/json',
       'User-Agent': `eusend-node/${SDK_VERSION}`,
       ...extraHeaders,
-    };
+    }
 
     try {
-      const res = await fetch(`${this.baseUrl}${path}`, { ...init, headers });
-      const responseHeaders = Object.fromEntries(res.headers.entries());
+      const res = await fetch(`${this.baseUrl}${path}`, { ...init, headers })
+      const responseHeaders = Object.fromEntries(res.headers.entries())
 
       if (!res.ok) {
-        let error: EusendError;
+        let error: EusendError
         try {
-          const json = (await res.json()) as { error?: string; code?: string };
+          const json = (await res.json()) as { error?: string; code?: string }
           error = {
             message: json.error ?? 'Unknown error',
             statusCode: res.status,
-            name: ((json.code as EusendError['name']) ?? 'INTERNAL_ERROR'),
-          };
+            name: (json.code as EusendError['name']) ?? 'INTERNAL_ERROR',
+          }
         } catch {
-          error = { message: 'Request failed', statusCode: res.status, name: 'INTERNAL_ERROR' };
+          error = { message: 'Request failed', statusCode: res.status, name: 'INTERNAL_ERROR' }
         }
-        return { data: null, error, headers: responseHeaders };
+        return { data: null, error, headers: responseHeaders }
       }
 
       if (res.status === 204 || res.headers.get('content-length') === '0') {
-        return { data: {} as T, error: null, headers: responseHeaders };
+        return { data: {} as T, error: null, headers: responseHeaders }
       }
 
-      const data = (await res.json()) as T;
-      return { data, error: null, headers: responseHeaders };
+      const data = (await res.json()) as T
+      return { data, error: null, headers: responseHeaders }
     } catch {
       return {
         data: null,
@@ -92,12 +92,12 @@ export class Eusend {
           name: 'application_error',
         },
         headers: null,
-      };
+      }
     }
   }
 
   get<T>(path: string, extraHeaders?: Record<string, string>): Promise<EusendResponse<T>> {
-    return this.fetchRequest<T>(path, { method: 'GET' }, extraHeaders);
+    return this.fetchRequest<T>(path, { method: 'GET' }, extraHeaders)
   }
 
   post<T>(
@@ -109,17 +109,17 @@ export class Eusend {
       path,
       { method: 'POST', body: body != null ? JSON.stringify(body) : undefined },
       extraHeaders,
-    );
+    )
   }
 
   patch<T>(path: string, body?: unknown): Promise<EusendResponse<T>> {
     return this.fetchRequest<T>(path, {
       method: 'PATCH',
       body: body != null ? JSON.stringify(body) : undefined,
-    });
+    })
   }
 
   delete<T>(path: string): Promise<EusendResponse<T>> {
-    return this.fetchRequest<T>(path, { method: 'DELETE' });
+    return this.fetchRequest<T>(path, { method: 'DELETE' })
   }
 }
