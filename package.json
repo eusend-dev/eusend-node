@@ -1,6 +1,6 @@
 {
   "name": "@eusend_dev/sdk",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Official Node.js SDK for the Eusend API",
   "author": "Eusend",
   "license": "MIT",
@@ -19,7 +19,9 @@
       }
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsdown src/index.ts --format esm,cjs --dts",
     "dev": "tsdown src/index.ts --format esm,cjs --dts --watch",
@@ -30,8 +32,12 @@
     "react": ">=18.0.0"
   },
   "peerDependenciesMeta": {
-    "@react-email/render": { "optional": true },
-    "react": { "optional": true }
+    "@react-email/render": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@react-email/render": "^1.0.0",

@@ -56,7 +56,7 @@ console.log(data?.id) // em_...
 | `text` | `string` | Plain text body |
 | `templateId` | `string` | ID of a saved template |
 | `variables` | `Record<string, unknown>` | Template variable substitutions |
-| `headers` | `Record<string, string>` | Custom email headers |
+| `headers` | `Record<string, string>` | Custom email headers. **Note:** not currently applied to outbound mail — the send path uses SES `SendEmail`, which doesn't carry custom headers. |
 | `trackOpens` | `boolean` | Track open events (default: `true`) |
 | `trackClicks` | `boolean` | Track click events (default: `true`) |
 
@@ -345,6 +345,8 @@ await client.audiences.deleteContact(audienceId, contactId)
 
 Templates let you define reusable email layouts with `{{variable}}` placeholders that are substituted at send time.
 
+> **Variable values are HTML-escaped.** A value you pass in `variables` is inserted as text, not markup — `{{name}}` with `"<b>Jane</b>"` renders the literal characters, not bold text. Put any HTML structure (links, formatting) in the template `html` itself, not in the variable values.
+
 ### Create a template (HTML)
 
 ```ts
@@ -414,6 +416,8 @@ console.log(data?.secret) // signing secret — only returned once, store it sec
 Pass `'*'` in the events array to subscribe to all events.
 
 Available events: `email.sent` `email.delivered` `email.bounced` `email.complained` `email.opened` `email.clicked`
+
+**Endpoint requirements:** the `url` must be a public `http(s)` endpoint — private, loopback, and internal addresses are rejected, both at creation and (after DNS resolution) before each delivery. Your endpoint must respond directly with a `2xx`; redirects (`3xx`) are not followed and are treated as a failed delivery.
 
 ### Verifying webhook signatures
 
