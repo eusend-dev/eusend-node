@@ -9,9 +9,12 @@ export type EusendErrorCode =
   | 'ALL_SUPPRESSED'
   | 'DOMAIN_NOT_VERIFIED'
   | 'SENDING_SUSPENDED'
+  | 'SERVICE_PAUSED'
   | 'INTERNAL_ERROR'
   | 'CONFLICT'
   | 'PLAN_LIMIT_EXCEEDED'
+  | 'BAD_REQUEST'
+  // SDK-only: the request never reached the server (network failure, DNS, timeout).
   | 'application_error';
 
 export interface EusendError {

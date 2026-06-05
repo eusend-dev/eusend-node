@@ -538,13 +538,16 @@ if (error) {
 | `FORBIDDEN` | 403 | Action not allowed on your plan |
 | `NOT_FOUND` | 404 | Resource not found |
 | `VALIDATION_ERROR` | 400 | Invalid request body |
+| `BAD_REQUEST` | 400 | Malformed request |
 | `CONFLICT` | 409 | Resource already exists |
 | `RATE_LIMITED` | 429 | Too many requests |
 | `MONTHLY_LIMIT_EXCEEDED` | 429 | Monthly send quota reached |
 | `DAILY_LIMIT_EXCEEDED` | 429 | Daily send quota reached (free plan) |
 | `PLAN_LIMIT_EXCEEDED` | 403 | Feature not available on your plan |
 | `DOMAIN_NOT_VERIFIED` | 403 | The sender domain is not verified for your organisation |
+| `SENDING_SUSPENDED` | 403 | Sending suspended for your account (high bounce or complaint rate) |
 | `ALL_SUPPRESSED` | 422 | All recipients are on the suppression list |
+| `SERVICE_PAUSED` | 503 | Sending is temporarily paused platform-wide |
 | `INTERNAL_ERROR` | 500 | Server error |
 | `application_error` | `null` | Network failure — request never reached the server |
 
