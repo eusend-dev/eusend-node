@@ -39,7 +39,7 @@ const { data, error } = await client.emails.send({
   text: 'Hello world',
 })
 
-console.log(data?.id) // em_...
+console.log(data?.id) // 9a8b7c6d-5e4f-4a3b-8c1d-0e9f8a7b6c5d (UUID)
 ```
 
 #### Options
@@ -130,7 +130,7 @@ console.log(data?.data) // [{ id: '...' }, { id: '...' }]
 ### Retrieve an email
 
 ```ts
-const { data } = await client.emails.get('em_...')
+const { data } = await client.emails.get('9a8b7c6d-5e4f-4a3b-8c1d-0e9f8a7b6c5d')
 
 console.log(data?.status)  // 'delivered'
 console.log(data?.events)  // [{ type: 'sent', ... }, { type: 'delivered', ... }]
