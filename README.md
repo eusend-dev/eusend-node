@@ -57,7 +57,7 @@ console.log(data?.id) // 9a8b7c6d-5e4f-4a3b-8c1d-0e9f8a7b6c5d (UUID)
 | `text` | `string` | Plain text body |
 | `templateId` | `string` | ID of a saved template |
 | `variables` | `Record<string, unknown>` | Template variable substitutions |
-| `headers` | `Record<string, string>` | Custom email headers. **Note:** not currently applied to outbound mail — the send path uses SES `SendEmail`, which doesn't carry custom headers. |
+| `headers` | `Record<string, string>` | Custom email headers, written into the outbound message. Header names and values may not contain line breaks. |
 | `trackOpens` | `boolean` | Track open events (default: `true`) |
 | `trackClicks` | `boolean` | Track click events (default: `true`) |
 
@@ -483,6 +483,10 @@ await client.broadcasts.create({
 ```
 
 `{{first_name}}`, `{{last_name}}`, `{{full_name}}`, and `{{email}}` are automatically available per recipient. Custom variables can be defined on the broadcast and are merged with per-recipient data.
+
+#### Unsubscribe handling
+
+Broadcasts and any send addressed to an audience contact automatically include RFC 8058 one-click unsubscribe headers (`List-Unsubscribe` + `List-Unsubscribe-Post: List-Unsubscribe=One-Click`) alongside a visible unsubscribe footer, so you satisfy Gmail/Yahoo bulk-sender requirements without any extra work. Unsubscribes are recorded against the contact and suppressed on future sends. You don't need to set these headers yourself.
 
 ### Send a broadcast
 
