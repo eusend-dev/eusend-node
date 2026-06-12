@@ -13,6 +13,10 @@ export type BroadcastStatus =
 export interface CreateBroadcastOptions {
   name: string;
   audienceId: string;
+  /**
+   * Sender address. Accepts a bare email (`onboarding@eusend.dev`) or a display-name
+   * form (`Acme <onboarding@eusend.dev>`). The domain must be verified on your account.
+   */
   from: string;
   subject: string;
   html?: string;

@@ -32,7 +32,8 @@ const client = new Eusend()
 
 ```ts
 const { data, error } = await client.emails.send({
-  from: 'you@yourdomain.com',
+  // `from` accepts a bare email or a display-name form: `Acme <you@yourdomain.com>`
+  from: 'Acme <you@yourdomain.com>',
   to: 'user@example.com',
   subject: 'Hello',
   html: '<p>Hello world</p>',

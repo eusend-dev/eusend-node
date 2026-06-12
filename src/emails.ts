@@ -21,6 +21,10 @@ export type EmailEventType =
   | 'complained';
 
 export interface SendEmailOptions {
+  /**
+   * Sender address. Accepts a bare email (`onboarding@eusend.dev`) or a display-name
+   * form (`Acme <onboarding@eusend.dev>`). The domain must be verified on your account.
+   */
   from: string;
   to: string | string[];
   cc?: string | string[];
