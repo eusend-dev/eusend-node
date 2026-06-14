@@ -47,7 +47,7 @@ console.log(data?.id) // 9a8b7c6d-5e4f-4a3b-8c1d-0e9f8a7b6c5d (UUID)
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `from` | `string` | Sender email address |
+| `from` | `string` | Sender address — a bare email or display-name form (`Acme <you@yourdomain.com>`). Must be from a verified domain. |
 | `to` | `string \| string[]` | Recipient(s). Maximum 50. |
 | `cc` | `string \| string[]` | CC recipient(s). Maximum 50. |
 | `bcc` | `string \| string[]` | BCC recipient(s). Maximum 50. |
@@ -427,10 +427,10 @@ Every delivery is signed with HMAC-SHA256. Verify the signature before processin
 ```ts
 import { createHmac, timingSafeEqual } from 'crypto'
 
-function verifyWebhook(req: Request, secret: string): boolean {
-  const webhookId = req.headers.get('x-webhook-id') ?? ''
-  const timestamp = req.headers.get('x-webhook-timestamp') ?? ''
-  const signature = req.headers.get('x-webhook-signature') ?? ''
+async function verifyWebhook(req: Request, secret: string): Promise<boolean> {
+  const webhookId = req.headers.get('webhook-id') ?? ''
+  const timestamp = req.headers.get('webhook-timestamp') ?? ''
+  const signature = req.headers.get('webhook-signature') ?? ''
 
   const body = await req.text()
   const expected = 'v1,' + createHmac('sha256', secret)
@@ -461,10 +461,10 @@ Send a single email to every contact in an audience.
 ```ts
 const { data } = await client.broadcasts.create({
   name: 'May newsletter',
-  audienceId: 'aud_...',
+  audienceId: '550e8400-e29b-41d4-a716-446655440000',
   from: 'Sivert <hello@yourdomain.com>',
   subject: 'May update',
-  html: '<p>Hi {{first_name}}, here is this month's update...</p>',
+  html: '<p>Hi {{first_name}}, your monthly update is here...</p>',
 })
 ```
 
@@ -475,7 +475,7 @@ import { MayNewsletter } from './emails/may-newsletter'
 
 await client.broadcasts.create({
   name: 'May newsletter',
-  audienceId: 'aud_...',
+  audienceId: '550e8400-e29b-41d4-a716-446655440000',
   from: 'Sivert <hello@yourdomain.com>',
   subject: 'May update',
   react: <MayNewsletter />,
@@ -486,13 +486,15 @@ await client.broadcasts.create({
 
 #### Unsubscribe handling
 
-Broadcasts and any send addressed to an audience contact automatically include RFC 8058 one-click unsubscribe headers (`List-Unsubscribe` + `List-Unsubscribe-Post: List-Unsubscribe=One-Click`), so you satisfy Gmail/Yahoo bulk-sender requirements without any extra work. Broadcasts additionally render a visible unsubscribe footer in the email body. An unsubscribe is recorded against the contact (`unsubscribedAt`) and excludes them from future broadcasts; transactional sends to that address still go through. You don't need to set these headers yourself.
+Broadcasts — and any single-recipient send whose recipient is a known audience contact — automatically include RFC 8058 one-click unsubscribe headers (`List-Unsubscribe` + `List-Unsubscribe-Post: List-Unsubscribe=One-Click`), so you satisfy Gmail/Yahoo bulk-sender requirements without any extra work. (Sends to multiple recipients at once omit the header, since a single unsubscribe link can't be attributed to one recipient.) Broadcasts additionally render a visible unsubscribe footer in the email body. An unsubscribe is recorded against the contact (`unsubscribedAt`) and excludes them from future broadcasts; transactional sends to that address still go through. You don't need to set these headers yourself.
 
 ### Send a broadcast
 
 ```ts
 await client.broadcasts.send(broadcastId)
 ```
+
+Calling `send` on a **paused** broadcast resumes it — sending continues from where it stopped, skipping recipients already sent. A broadcast pauses if it hits your monthly or daily send limit, the sender domain becomes unverified, or platform-wide sending is paused.
 
 ### Schedule a broadcast
 
@@ -547,7 +549,7 @@ if (error) {
 | `CONFLICT` | 409 | Resource already exists |
 | `RATE_LIMITED` | 429 | Too many requests |
 | `MONTHLY_LIMIT_EXCEEDED` | 429 | Monthly send quota reached |
-| `DAILY_LIMIT_EXCEEDED` | 429 | Daily send quota reached (free plan) |
+| `DAILY_LIMIT_EXCEEDED` | 429 | Daily send ceiling reached (applies to all plans; ramps up as your account warms, resets midnight UTC) |
 | `PLAN_LIMIT_EXCEEDED` | 403 | Feature not available on your plan |
 | `DOMAIN_NOT_VERIFIED` | 403 | The sender domain is not verified for your organisation |
 | `SENDING_SUSPENDED` | 403 | Sending suspended for your account (high bounce or complaint rate) |
