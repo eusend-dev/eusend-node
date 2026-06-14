@@ -486,7 +486,7 @@ await client.broadcasts.create({
 
 #### Unsubscribe handling
 
-Broadcasts and any send addressed to an audience contact automatically include RFC 8058 one-click unsubscribe headers (`List-Unsubscribe` + `List-Unsubscribe-Post: List-Unsubscribe=One-Click`) alongside a visible unsubscribe footer, so you satisfy Gmail/Yahoo bulk-sender requirements without any extra work. Unsubscribes are recorded against the contact and suppressed on future sends. You don't need to set these headers yourself.
+Broadcasts and any send addressed to an audience contact automatically include RFC 8058 one-click unsubscribe headers (`List-Unsubscribe` + `List-Unsubscribe-Post: List-Unsubscribe=One-Click`), so you satisfy Gmail/Yahoo bulk-sender requirements without any extra work. Broadcasts additionally render a visible unsubscribe footer in the email body. An unsubscribe is recorded against the contact (`unsubscribedAt`) and excludes them from future broadcasts; transactional sends to that address still go through. You don't need to set these headers yourself.
 
 ### Send a broadcast
 
