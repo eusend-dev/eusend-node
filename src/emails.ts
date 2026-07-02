@@ -27,9 +27,16 @@ export interface Attachment {
   filename: string;
   /**
    * File contents. A base64-encoded string (sent as-is) or raw bytes
-   * (`Uint8Array`/`Buffer`), which the SDK base64-encodes for you.
+   * (`Uint8Array`/`Buffer`), which the SDK base64-encodes for you. Provide either
+   * `content` or `path`, not both.
    */
-  content: string | Uint8Array;
+  content?: string | Uint8Array;
+  /**
+   * A URL the server fetches at send time to attach the file. Use instead of
+   * `content` when the bytes live on a public URL. Provide either `content` or `path`,
+   * not both.
+   */
+  path?: string;
   /** MIME type, e.g. `application/pdf`. Inferred from the filename when omitted. */
   contentType?: string;
   /**
@@ -187,7 +194,8 @@ async function toApiPayload(options: SendEmailOptions) {
     track_clicks: options.trackClicks,
     attachments: options.attachments?.map((a) => ({
       filename: a.filename,
-      content: encodeAttachmentContent(a.content),
+      content: a.content === undefined ? undefined : encodeAttachmentContent(a.content),
+      path: a.path,
       content_type: a.contentType,
       content_id: a.contentId,
     })),
