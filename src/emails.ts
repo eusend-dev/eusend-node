@@ -4,6 +4,8 @@ import { renderReactEmail, type ReactEmailElement } from './react-render';
 
 export type EmailStatus =
   | 'queued'
+  | 'scheduled'
+  | 'canceled'
   | 'sending'
   | 'sent'
   | 'delivered'
@@ -63,6 +65,12 @@ export interface SendEmailOptions {
   trackClicks?: boolean;
   /** File attachments. Up to 20 per message, 10 MB combined. */
   attachments?: Attachment[];
+  /**
+   * Schedule the send for a future time — an ISO 8601 string or a `Date`, at most
+   * 30 days out. The email is created with status `scheduled`; reschedule it with
+   * `emails.update()` or call `emails.cancel()` any time before it sends.
+   */
+  scheduledAt?: string | Date;
 }
 
 export interface SendEmailRequestOptions {
@@ -97,8 +105,26 @@ export interface Email {
   status: EmailStatus;
   testMode: boolean;
   templateId: string | null;
+  /** Set only for scheduled sends. */
+  scheduledAt: string | null;
   createdAt: string;
   events: EmailEvent[];
+}
+
+export interface UpdateEmailOptions {
+  /** The new send time — an ISO 8601 string or a `Date`, at most 30 days out. */
+  scheduledAt: string | Date;
+}
+
+export interface UpdateEmailResponse {
+  id: string;
+  status: 'scheduled';
+  scheduledAt: string;
+}
+
+export interface CancelEmailResponse {
+  id: string;
+  status: 'canceled';
 }
 
 export interface EmailListItem {
@@ -139,6 +165,10 @@ function encodeAttachmentContent(content: string | Uint8Array): string {
   return btoa(binary);
 }
 
+function toIsoString(value: string | Date): string {
+  return value instanceof Date ? value.toISOString() : value;
+}
+
 async function toApiPayload(options: SendEmailOptions) {
   const html = await resolveHtml(options);
   return {
@@ -161,6 +191,7 @@ async function toApiPayload(options: SendEmailOptions) {
       content_type: a.contentType,
       content_id: a.contentId,
     })),
+    scheduled_at: options.scheduledAt ? toIsoString(options.scheduledAt) : undefined,
   };
 }
 
@@ -209,5 +240,27 @@ export class Emails {
 
   get(id: string): Promise<EusendResponse<Email>> {
     return this.client.get<Email>(`/emails/${id}`);
+  }
+
+  /** Reschedule a scheduled email. Fails once the email has started sending. */
+  async update(
+    id: string,
+    options: UpdateEmailOptions,
+  ): Promise<EusendResponse<UpdateEmailResponse>> {
+    const res = await this.client.patch<{ id: string; status: 'scheduled'; scheduled_at: string }>(
+      `/emails/${id}`,
+      { scheduled_at: toIsoString(options.scheduledAt) },
+    );
+    if (res.error) return res;
+    return {
+      data: { id: res.data.id, status: res.data.status, scheduledAt: res.data.scheduled_at },
+      error: null,
+      headers: res.headers,
+    };
+  }
+
+  /** Cancel a scheduled email. Fails once the email has started sending. */
+  cancel(id: string): Promise<EusendResponse<CancelEmailResponse>> {
+    return this.client.post<CancelEmailResponse>(`/emails/${id}/cancel`, undefined);
   }
 }

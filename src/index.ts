@@ -8,6 +8,7 @@ export type {
   SendEmailRequestOptions,
   SendEmailResponse,
   BatchSendResponse,
+  CancelEmailResponse,
   Email,
   EmailEvent,
   EmailEventType,
@@ -15,6 +16,8 @@ export type {
   EmailStatus,
   ListEmailsOptions,
   ListEmailsResponse,
+  UpdateEmailOptions,
+  UpdateEmailResponse,
 } from './emails';
 
 export type {
