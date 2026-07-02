@@ -3,6 +3,7 @@ export type { EusendOptions } from './eusend';
 export type { EusendError, EusendErrorCode, EusendResponse } from './interfaces';
 
 export type {
+  Attachment,
   SendEmailOptions,
   SendEmailRequestOptions,
   SendEmailResponse,

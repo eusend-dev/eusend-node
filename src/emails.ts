@@ -20,6 +20,23 @@ export type EmailEventType =
   | 'bounced'
   | 'complained';
 
+export interface Attachment {
+  /** Name the recipient sees for the file, e.g. `invoice.pdf`. */
+  filename: string;
+  /**
+   * File contents. A base64-encoded string (sent as-is) or raw bytes
+   * (`Uint8Array`/`Buffer`), which the SDK base64-encodes for you.
+   */
+  content: string | Uint8Array;
+  /** MIME type, e.g. `application/pdf`. Inferred from the filename when omitted. */
+  contentType?: string;
+  /**
+   * Content-ID for an inline attachment. Set it to reference the file from your
+   * HTML with `<img src="cid:<contentId>">` instead of showing it as a download.
+   */
+  contentId?: string;
+}
+
 export interface SendEmailOptions {
   /**
    * Sender address. Accepts a bare email (`onboarding@eusend.dev`) or a display-name
@@ -44,6 +61,8 @@ export interface SendEmailOptions {
   headers?: Record<string, string>;
   trackOpens?: boolean;
   trackClicks?: boolean;
+  /** File attachments. Up to 20 per message, 10 MB combined. */
+  attachments?: Attachment[];
 }
 
 export interface SendEmailRequestOptions {
@@ -111,6 +130,15 @@ async function resolveHtml(options: SendEmailOptions): Promise<string | undefine
   return undefined;
 }
 
+function encodeAttachmentContent(content: string | Uint8Array): string {
+  // A string is assumed to already be base64. Raw bytes are encoded here.
+  if (typeof content === 'string') return content;
+  if (typeof Buffer !== 'undefined') return Buffer.from(content).toString('base64');
+  let binary = '';
+  for (const byte of content) binary += String.fromCharCode(byte);
+  return btoa(binary);
+}
+
 async function toApiPayload(options: SendEmailOptions) {
   const html = await resolveHtml(options);
   return {
@@ -127,6 +155,12 @@ async function toApiPayload(options: SendEmailOptions) {
     headers: options.headers,
     track_opens: options.trackOpens,
     track_clicks: options.trackClicks,
+    attachments: options.attachments?.map((a) => ({
+      filename: a.filename,
+      content: encodeAttachmentContent(a.content),
+      content_type: a.contentType,
+      content_id: a.contentId,
+    })),
   };
 }
 
@@ -149,9 +183,8 @@ export class Emails {
     emails: SendEmailOptions[],
   ): Promise<EusendResponse<BatchSendResponse>> {
     const payloads = await Promise.all(emails.map(toApiPayload));
-    return this.client.post<BatchSendResponse>('/emails/batch', {
-      emails: payloads,
-    });
+    // Resend-compatible: the request body is a top-level array of email objects.
+    return this.client.post<BatchSendResponse>('/emails/batch', payloads);
   }
 
   async list(options: ListEmailsOptions = {}): Promise<EusendResponse<ListEmailsResponse>> {
