@@ -110,7 +110,7 @@ const { data } = await client.emails.send(
 Up to 100 emails in a single request.
 
 ```ts
-const { data } = await client.emails.batch([
+const { data } = await client.batch.send([
   {
     from: 'you@yourdomain.com',
     to: 'alice@example.com',

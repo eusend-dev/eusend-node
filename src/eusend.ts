@@ -1,5 +1,6 @@
 import type { EusendError, EusendResponse } from './interfaces'
 import { Emails } from './emails'
+import { Batch } from './batch'
 import { Domains } from './domains'
 import { ApiKeys } from './api-keys'
 import { Audiences } from './audiences'
@@ -19,6 +20,8 @@ export class Eusend {
   private readonly apiKey: string
 
   readonly emails: Emails
+  /** Batch sending — `client.batch.send([...])`. Mirrors Resend's `resend.batch.send()`. */
+  readonly batch: Batch
   readonly domains: Domains
   readonly apiKeys: ApiKeys
   readonly audiences: Audiences
@@ -38,6 +41,7 @@ export class Eusend {
     this.baseUrl = options?.baseUrl ?? DEFAULT_BASE_URL
 
     this.emails = new Emails(this)
+    this.batch = new Batch(this)
     this.domains = new Domains(this)
     this.apiKeys = new ApiKeys(this)
     this.audiences = new Audiences(this)

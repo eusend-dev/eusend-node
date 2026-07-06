@@ -73,8 +73,11 @@ export interface SendEmailOptions {
   /** File attachments. Up to 20 per message, 10 MB combined. */
   attachments?: Attachment[];
   /**
-   * Schedule the send for a future time — an ISO 8601 string or a `Date`, at most
-   * 30 days out. The email is created with status `scheduled`; reschedule it with
+   * Schedule the send for a future time, at most 30 days out. Accepts a `Date`, an
+   * ISO 8601 string, or a natural-language time like `"in 1 hour"` or `"tomorrow at
+   * 9am"` (parsed server-side, same as Resend). Relative phrasings resolve against the
+   * server clock in UTC — pass an offset-qualified ISO string when you need an exact
+   * instant. The email is created with status `scheduled`; reschedule it with
    * `emails.update()` or call `emails.cancel()` any time before it sends.
    */
   scheduledAt?: string | Date;
@@ -119,7 +122,8 @@ export interface Email {
 }
 
 export interface UpdateEmailOptions {
-  /** The new send time — an ISO 8601 string or a `Date`, at most 30 days out. */
+  /** The new send time, at most 30 days out — a `Date`, an ISO 8601 string, or natural
+   *  language like `"in 1 hour"` (parsed server-side, same as `emails.send`). */
   scheduledAt: string | Date;
 }
 
@@ -176,7 +180,7 @@ function toIsoString(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
 }
 
-async function toApiPayload(options: SendEmailOptions) {
+export async function toApiPayload(options: SendEmailOptions) {
   const html = await resolveHtml(options);
   return {
     from: options.from,
@@ -216,14 +220,6 @@ export class Emails {
     }
     const payload = await toApiPayload(options);
     return this.client.post<SendEmailResponse>('/emails', payload, extraHeaders);
-  }
-
-  async batch(
-    emails: SendEmailOptions[],
-  ): Promise<EusendResponse<BatchSendResponse>> {
-    const payloads = await Promise.all(emails.map(toApiPayload));
-    // Resend-compatible: the request body is a top-level array of email objects.
-    return this.client.post<BatchSendResponse>('/emails/batch', payloads);
   }
 
   async list(options: ListEmailsOptions = {}): Promise<EusendResponse<ListEmailsResponse>> {
