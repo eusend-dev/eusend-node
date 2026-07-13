@@ -8,6 +8,11 @@ import { toApiPayload, type SendEmailOptions, type BatchSendResponse } from './e
  * The HTTP body is a top-level array of email objects (POST /emails/batch), up to 100
  * per request. As with Resend, attachments and `scheduledAt` are not supported on the
  * batch endpoint — send those individually via `emails.send`.
+ *
+ * The response maps positionally to the input: `data[i]` is `{ id }` when
+ * `emails[i]` was queued, or `{ error, code }` when it was not (unverified
+ * domain, suppressed recipients, exhausted quota, …) — failed items never fail
+ * the whole batch, so branch on the presence of `id` per item.
  */
 export class Batch {
   constructor(private readonly client: Eusend) {}

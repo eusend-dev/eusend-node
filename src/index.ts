@@ -7,6 +7,7 @@ export type {
   SendEmailOptions,
   SendEmailRequestOptions,
   SendEmailResponse,
+  BatchItemResult,
   BatchSendResponse,
   CancelEmailResponse,
   Email,

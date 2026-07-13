@@ -1,5 +1,5 @@
 import type { Eusend } from './eusend';
-import type { EusendResponse } from './interfaces';
+import type { EusendErrorCode, EusendResponse } from './interfaces';
 import { renderReactEmail, type ReactEmailElement } from './react-render';
 
 export type EmailStatus =
@@ -91,8 +91,19 @@ export interface SendEmailResponse {
   id: string;
 }
 
+/**
+ * Per-item outcome of a batch send, positionally mapped to the input array:
+ * `data[i]` describes `emails[i]`. Items that were queued carry `{ id }`; items
+ * that could not be queued carry `{ error, code }` (e.g. an unverified sender
+ * domain, all recipients suppressed, or an exhausted send quota). Branch on the
+ * presence of `id`.
+ */
+export type BatchItemResult =
+  | { id: string; error?: never; code?: never }
+  | { id?: never; error: string; code: EusendErrorCode };
+
 export interface BatchSendResponse {
-  data: SendEmailResponse[];
+  data: BatchItemResult[];
 }
 
 export interface EmailEvent {
