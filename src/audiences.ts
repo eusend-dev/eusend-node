@@ -126,11 +126,16 @@ export class Audiences {
     );
   }
 
+  /**
+   * Upsert up to 1000 contacts in one call. Addresses are lowercased and
+   * de-duplicated server-side; `count` is the number of rows written and
+   * `duplicates` how many repeated addresses were collapsed to get there.
+   */
   batchCreateContacts(
     audienceId: string,
     options: BatchCreateContactsOptions,
-  ): Promise<EusendResponse<{ count: number }>> {
-    return this.client.post<{ count: number }>(`/audiences/${audienceId}/contacts/batch`, {
+  ): Promise<EusendResponse<{ count: number; duplicates: number }>> {
+    return this.client.post<{ count: number; duplicates: number }>(`/audiences/${audienceId}/contacts/batch`, {
       contacts: options.contacts.map((c) => ({
         email: c.email,
         first_name: c.firstName,
