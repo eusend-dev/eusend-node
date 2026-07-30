@@ -15,6 +15,7 @@ export type EusendErrorCode =
   | 'CONFLICT'
   | 'PLAN_LIMIT_EXCEEDED'
   | 'BAD_REQUEST'
+  | 'PAYLOAD_TOO_LARGE'
   // SDK-only: the request never reached the server (network failure, DNS, timeout).
   | 'application_error';
 
