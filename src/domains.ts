@@ -7,13 +7,26 @@ export interface DnsRecord {
   type: string;
   name: string;
   value: string;
+  /** MX records only. */
+  priority?: number;
+  /**
+   * `authentication` — required before the domain can send.
+   * `policy` — recommended; absence weakens but does not block.
+   * `alignment` — optional; publishing all of them enables Return-Path SPF alignment.
+   */
+  purpose?: string;
+  description?: string;
 }
 
 export interface CreateDomainResponse {
   id: string;
   name: string;
+  /**
+   * Every record to publish, in presentation order. Prefer this over the individual
+   * keys below — it is the only place the optional Return-Path alignment records appear.
+   */
+  records: DnsRecord[];
   dkim: DnsRecord;
-  spf: DnsRecord;
   dmarc: DnsRecord;
 }
 

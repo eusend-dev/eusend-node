@@ -9,7 +9,7 @@ import { Webhooks } from './webhooks'
 import { Broadcasts } from './broadcasts'
 
 const DEFAULT_BASE_URL = 'https://api.eusend.dev'
-const SDK_VERSION = '0.6.0'
+const SDK_VERSION = '0.7.0'
 
 export interface EusendOptions {
   baseUrl?: string
