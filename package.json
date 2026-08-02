@@ -4,6 +4,12 @@
   "description": "Official Node.js SDK for the Eusend API",
   "author": "Eusend",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eusend-dev/eusend-node.git"
+  },
+  "homepage": "https://eusend.dev/docs",
+  "bugs": "https://github.com/eusend-dev/eusend-node/issues",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
