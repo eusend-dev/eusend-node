@@ -31,6 +31,7 @@ export type {
 
 export type {
   ApiKey,
+  ApiKeyPermission,
   CreateApiKeyOptions,
   CreateApiKeyResponse,
 } from './api-keys';

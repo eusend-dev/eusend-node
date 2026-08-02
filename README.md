@@ -226,11 +226,31 @@ const { data } = await client.apiKeys.create({ name: 'Sandbox', testMode: true }
 // data.key → 'eu_test_...'
 ```
 
+### Scoping a key
+
+`permission` defaults to `'full_access'` — every resource. `'sending_access'` limits the key to sending email (plus rescheduling and canceling a scheduled send); every other endpoint, including reading your email logs, returns `403 FORBIDDEN`.
+
+```ts
+await client.apiKeys.create({ name: 'App server', permission: 'sending_access' })
+```
+
+A sending-access key can additionally be pinned to one sending domain. Sends from any other domain are rejected. `domainId` is only valid with `permission: 'sending_access'`.
+
+```ts
+await client.apiKeys.create({
+  name: 'Billing service',
+  permission: 'sending_access',
+  domainId,
+})
+```
+
+Deleting a domain revokes every key restricted to it.
+
 ### List API keys
 
 ```ts
 const { data } = await client.apiKeys.list()
-// [{ id, name, prefix, testMode, createdAt, lastUsedAt }]
+// [{ id, name, prefix, testMode, permission, domainId, domainName, createdAt, lastUsedAt }]
 ```
 
 The full key is never returned after creation — only the prefix (e.g. `eu_live_Lx_e`).
