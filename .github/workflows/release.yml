@@ -1,0 +1,65 @@
+name: release
+
+# Publishes @eusend_dev/sdk to npm. Pushing a `v*` tag is the trigger; the tag is made from
+# the eusend monorepo with `bun run sdk:release node patch`, which bumps package.json here
+# before tagging.
+#
+# Uploads use npm Trusted Publishing (OIDC) — no token lives in this repo's secrets. The trust
+# is configured on npmjs.com against this repo AND this filename, so renaming this file breaks
+# publishing until the trusted publisher is updated to match.
+#
+# This repo exists because of --provenance. The SDK used to be published straight from the
+# monorepo, which is private, and npm rejects provenance from a private source repository:
+# "Unsupported GitHub Actions source repository visibility". Provenance is what lets a user
+# verify the tarball was built from this commit by this workflow, so the source moved here
+# rather than the flag being dropped.
+
+on:
+  push:
+    tags: ['v*']
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # The OIDC token npm exchanges for short-lived publish rights. Without it, npm falls
+      # back to looking for a token and fails.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      # npm will not let a version be replaced once published, so a tag that disagrees with
+      # package.json has exactly one chance to be caught — here, before the upload.
+      - name: Tag must match the version in package.json
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg=$(node -p "require('./package.json').version")
+
+          if [ "$pkg" != "$tag" ]; then
+            echo "::error::package.json says $pkg, tag says $tag"
+            exit 1
+          fi
+          echo "package.json version $pkg matches tag"
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun run typecheck
+
+      - run: bun run build
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
