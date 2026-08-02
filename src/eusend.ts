@@ -7,9 +7,10 @@ import { Audiences } from './audiences'
 import { Templates } from './templates'
 import { Webhooks } from './webhooks'
 import { Broadcasts } from './broadcasts'
+import { Suppressions } from './suppressions'
 
 const DEFAULT_BASE_URL = 'https://api.eusend.dev'
-const SDK_VERSION = '0.7.1'
+const SDK_VERSION = '0.8.0'
 
 export interface EusendOptions {
   baseUrl?: string
@@ -28,6 +29,7 @@ export class Eusend {
   readonly templates: Templates
   readonly webhooks: Webhooks
   readonly broadcasts: Broadcasts
+  readonly suppressions: Suppressions
 
   constructor(key?: string, options?: EusendOptions) {
     const apiKey =
@@ -48,12 +50,17 @@ export class Eusend {
     this.templates = new Templates(this)
     this.webhooks = new Webhooks(this)
     this.broadcasts = new Broadcasts(this)
+    this.suppressions = new Suppressions(this)
   }
 
   async fetchRequest<T>(
     path: string,
     init: RequestInit = {},
     extraHeaders: Record<string, string> = {},
+    // Not every successful endpoint answers with JSON — the suppression export returns
+    // CSV. Parsing that as JSON throws inside the try below, which would surface a
+    // perfectly good download as "Network request failed".
+    parse: 'json' | 'text' = 'json',
   ): Promise<EusendResponse<T>> {
     const headers: Record<string, string> = {
       Authorization: `Bearer ${this.apiKey}`,
@@ -85,7 +92,7 @@ export class Eusend {
         return { data: {} as T, error: null, headers: responseHeaders }
       }
 
-      const data = (await res.json()) as T
+      const data = (parse === 'text' ? await res.text() : await res.json()) as T
       return { data, error: null, headers: responseHeaders }
     } catch {
       return {

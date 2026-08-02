@@ -74,3 +74,13 @@ export type {
   SendBroadcastResponse,
   UpdateBroadcastOptions,
 } from './broadcasts';
+
+export type {
+  CreateSuppressionOptions,
+  ImportSuppressionsResponse,
+  ListSuppressionsOptions,
+  ListSuppressionsResponse,
+  SuppressionEntry,
+  SuppressionImportItem,
+  SuppressionReason,
+} from './suppressions';

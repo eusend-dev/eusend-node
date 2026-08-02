@@ -342,6 +342,64 @@ await client.audiences.deleteContact(audienceId, contactId)
 
 ---
 
+## Suppressions
+
+Addresses the account will not send to. Hard bounces and spam complaints are added
+automatically; these methods cover the ones you manage yourself. A send to a suppressed
+address is skipped and recorded with status `suppressed`; if every recipient is
+suppressed the send fails with `ALL_SUPPRESSED`.
+
+Test-mode keys can read the list but not modify it.
+
+### List suppressions
+
+```ts
+const { data } = await client.suppressions.list({ reason: 'bounce', limit: 50 })
+// { data: [{ id, email, reason, created_at }], next_cursor: null }
+
+// Everything suppressed at one domain
+await client.suppressions.list({ email: '@acme.com' })
+```
+
+### Suppress an address
+
+```ts
+await client.suppressions.create({ email: 'opted-out@example.com' })
+```
+
+If the address is already suppressed the existing entry is returned unchanged — a manual
+add never rewrites a real bounce or complaint.
+
+### Import a list
+
+Up to 1,000 addresses per call. Items may be bare strings or objects, so a column lifted
+straight out of a CSV works as-is. Import before your first send when migrating, so
+addresses that already bounced elsewhere don't get a fresh attempt from a new IP.
+
+```ts
+const { data } = await client.suppressions.import([
+  'one@example.com',
+  { email: 'two@example.com', reason: 'complaint' },
+])
+
+console.log(data?.count)              // written
+console.log(data?.already_suppressed) // were already on the list
+console.log(data?.duplicates)         // repeated rows collapsed
+```
+
+### Remove an address
+
+```ts
+await client.suppressions.remove('invalid@example.com') // or the entry id
+```
+
+### Export
+
+```ts
+const { data: csv } = await client.suppressions.export()
+// "email,reason,created_at\n..."
+```
+
 ## Templates
 
 Templates let you define reusable email layouts with `{{variable}}` placeholders that are substituted at send time.
