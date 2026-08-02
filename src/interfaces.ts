@@ -10,6 +10,8 @@ export type EusendErrorCode =
   | 'DOMAIN_NOT_VERIFIED'
   | 'SENDING_SUSPENDED'
   | 'SERVICE_PAUSED'
+  | 'LIST_SEND_HELD'
+  | 'BROADCAST_HELD'
   | 'ATTACHMENT_STORAGE_ERROR'
   | 'INTERNAL_ERROR'
   | 'CONFLICT'
@@ -17,14 +19,14 @@ export type EusendErrorCode =
   | 'BAD_REQUEST'
   | 'PAYLOAD_TOO_LARGE'
   // SDK-only: the request never reached the server (network failure, DNS, timeout).
-  | 'application_error';
+  | 'application_error'
 
 export interface EusendError {
-  message: string;
-  statusCode: number | null;
-  name: EusendErrorCode;
+  message: string
+  statusCode: number | null
+  name: EusendErrorCode
 }
 
 export type EusendResponse<T> =
   | { data: T; error: null; headers: Record<string, string> }
-  | { data: null; error: EusendError; headers: Record<string, string> | null };
+  | { data: null; error: EusendError; headers: Record<string, string> | null }
