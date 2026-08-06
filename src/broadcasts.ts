@@ -2,12 +2,17 @@ import type { Eusend } from './eusend';
 import type { EusendResponse } from './interfaces';
 import { renderReactEmail, type ReactEmailElement } from './react-render';
 
+/**
+ * `held` is a list send stopped part-way pending review. Unlike `paused` it cannot be
+ * resumed by sending again — `send()` returns BROADCAST_HELD until the review clears.
+ */
 export type BroadcastStatus =
   | 'draft'
   | 'scheduled'
   | 'sending'
   | 'sent'
   | 'paused'
+  | 'held'
   | 'cancelled';
 
 export interface CreateBroadcastOptions {
@@ -142,10 +147,25 @@ export class Broadcasts {
     });
   }
 
-  send(id: string, options: SendBroadcastOptions = {}): Promise<EusendResponse<SendBroadcastResponse>> {
-    return this.client.post<SendBroadcastResponse>(`/broadcasts/${id}/send`, {
+  async send(
+    id: string,
+    options: SendBroadcastOptions = {},
+  ): Promise<EusendResponse<SendBroadcastResponse>> {
+    // This endpoint is the one broadcast response that comes back snake_cased, so
+    // map it rather than exposing a `scheduledAt` that is always undefined.
+    const res = await this.client.post<{
+      id: string;
+      status: 'sending' | 'scheduled';
+      scheduled_at: string | null;
+    }>(`/broadcasts/${id}/send`, {
       scheduled_at: options.scheduledAt,
     });
+    if (res.error) return res;
+    return {
+      data: { id: res.data.id, status: res.data.status, scheduledAt: res.data.scheduled_at },
+      error: null,
+      headers: res.headers,
+    };
   }
 
   cancel(id: string): Promise<EusendResponse<Broadcast>> {
