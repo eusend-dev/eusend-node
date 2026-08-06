@@ -46,6 +46,24 @@ export interface Attachment {
   contentId?: string;
 }
 
+/** A single tag in the `[{ name, value }]` form, for Resend-compatible payloads. */
+export interface EmailTag {
+  name: string;
+  value: string;
+}
+
+/**
+ * Labels attached to a send, used to filter your email log and to route webhook events.
+ *
+ * Accepts either a plain object (`{ category: 'password_reset' }`) or the
+ * `[{ name, value }]` array form, so a payload written against Resend works unchanged.
+ * Responses and webhook payloads always return the object form.
+ *
+ * Names and values may contain ASCII letters, numbers, underscores and dashes; up to 10
+ * tags per email.
+ */
+export type EmailTags = Record<string, string> | EmailTag[];
+
 export interface SendEmailOptions {
   /**
    * Sender address. Accepts a bare email (`onboarding@eusend.dev`) or a display-name
@@ -68,6 +86,12 @@ export interface SendEmailOptions {
   templateId?: string;
   variables?: Record<string, unknown>;
   headers?: Record<string, string>;
+  /**
+   * Labels for log filtering and webhook routing, e.g.
+   * `{ category: 'password_reset', tier: 'pro' }`. Returned on every `email.*` webhook
+   * event for this send.
+   */
+  tags?: EmailTags;
   trackOpens?: boolean;
   trackClicks?: boolean;
   /** File attachments. Up to 20 per message, 10 MB combined. */
@@ -124,6 +148,8 @@ export interface Email {
   html: string | null;
   text: string | null;
   status: EmailStatus;
+  /** Always the object form, `{}` when the send carried no tags. */
+  tags: Record<string, string>;
   testMode: boolean;
   templateId: string | null;
   /** Set only for scheduled sends. */
@@ -155,6 +181,8 @@ export interface EmailListItem {
   to: string[];
   subject: string;
   status: EmailStatus;
+  /** Always the object form, `{}` when the send carried no tags. */
+  tags: Record<string, string>;
   testMode: boolean;
   createdAt: string;
 }
@@ -165,6 +193,11 @@ export interface ListEmailsOptions {
   status?: EmailStatus;
   from?: string;
   to?: string;
+  /**
+   * Filter by tag. `'category:password_reset'` matches that exact pair; a bare
+   * `'category'` matches any email carrying the tag. Pass an array to require several.
+   */
+  tag?: string | string[];
 }
 
 export interface ListEmailsResponse {
@@ -205,6 +238,7 @@ export async function toApiPayload(options: SendEmailOptions) {
     template_id: options.templateId,
     variables: options.variables,
     headers: options.headers,
+    tags: options.tags,
     track_opens: options.trackOpens,
     track_clicks: options.trackClicks,
     attachments: options.attachments?.map((a) => ({
@@ -240,6 +274,10 @@ export class Emails {
     if (options.status) params.set('status', options.status);
     if (options.from) params.set('from', options.from);
     if (options.to) params.set('to', options.to);
+    // Repeated `tag` params, one per filter — the API ANDs them.
+    for (const tag of options.tag == null ? [] : [options.tag].flat()) {
+      params.append('tag', tag);
+    }
     const qs = params.toString();
 
     const res = await this.client.get<{ data: EmailListItem[]; next_cursor: string | null }>(
