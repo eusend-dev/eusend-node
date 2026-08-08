@@ -33,6 +33,16 @@ export interface CreateBroadcastOptions {
   react?: ReactEmailElement;
   templateId?: string;
   templateVariables?: Record<string, string>;
+  /**
+   * Embed the open-tracking pixel for this broadcast. Omit to use your organization's
+   * default (Settings → General → Email tracking); `false` always wins over it.
+   */
+  trackOpens?: boolean;
+  /**
+   * Rewrite links so clicks are recorded. Omit to use your organization's default;
+   * `false` leaves the original URLs untouched in the delivered mail.
+   */
+  trackClicks?: boolean;
 }
 
 export interface UpdateBroadcastOptions {
@@ -48,6 +58,16 @@ export interface UpdateBroadcastOptions {
   templateId?: string | null;
   templateVariables?: Record<string, string> | null;
   scheduledAt?: string | null;
+  /**
+   * Embed the open-tracking pixel for this broadcast. Omit to use your organization's
+   * default (Settings → General → Email tracking); `false` always wins over it.
+   */
+  trackOpens?: boolean;
+  /**
+   * Rewrite links so clicks are recorded. Omit to use your organization's default;
+   * `false` leaves the original URLs untouched in the delivered mail.
+   */
+  trackClicks?: boolean;
 }
 
 export interface SendBroadcastOptions {
@@ -65,6 +85,8 @@ export interface Broadcast {
   templateId: string | null;
   templateVariables: Record<string, string> | null;
   scheduledAt: string | null;
+  trackOpens: boolean;
+  trackClicks: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -120,6 +142,8 @@ export class Broadcasts {
       html,
       template_id: options.templateId,
       template_variables: options.templateVariables,
+      track_opens: options.trackOpens,
+      track_clicks: options.trackClicks,
     });
   }
 
@@ -144,6 +168,8 @@ export class Broadcasts {
       template_id: options.templateId,
       template_variables: options.templateVariables,
       scheduled_at: options.scheduledAt,
+      track_opens: options.trackOpens,
+      track_clicks: options.trackClicks,
     });
   }
 

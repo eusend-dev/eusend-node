@@ -58,8 +58,8 @@ console.log(data?.id) // 9a8b7c6d-5e4f-4a3b-8c1d-0e9f8a7b6c5d (UUID)
 | `templateId` | `string` | ID of a saved template |
 | `variables` | `Record<string, unknown>` | Template variable substitutions |
 | `headers` | `Record<string, string>` | Custom email headers, written into the outbound message. Header names and values may not contain line breaks. |
-| `trackOpens` | `boolean` | Track open events (default: `true`) |
-| `trackClicks` | `boolean` | Track click events (default: `true`) |
+| `trackOpens` | `boolean` | Track open events. Omit to use your organization default |
+| `trackClicks` | `boolean` | Track click events. Omit to use your organization default |
 
 At least one of `html`, `react`, `text`, or `templateId` is required.
 
