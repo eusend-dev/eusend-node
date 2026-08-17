@@ -1,6 +1,6 @@
-export { Eusend } from './eusend';
-export type { EusendOptions } from './eusend';
-export type { EusendError, EusendErrorCode, EusendResponse } from './interfaces';
+export { Eusend } from './eusend'
+export type { EusendOptions } from './eusend'
+export type { EusendError, EusendErrorCode, EusendResponse } from './interfaces'
 
 export type {
   Attachment,
@@ -19,7 +19,7 @@ export type {
   ListEmailsResponse,
   UpdateEmailOptions,
   UpdateEmailResponse,
-} from './emails';
+} from './emails'
 
 export type {
   CreateDomainResponse,
@@ -27,14 +27,14 @@ export type {
   Domain,
   DomainListItem,
   DomainStatus,
-} from './domains';
+} from './domains'
 
 export type {
   ApiKey,
   ApiKeyPermission,
   CreateApiKeyOptions,
   CreateApiKeyResponse,
-} from './api-keys';
+} from './api-keys'
 
 export type {
   Audience,
@@ -46,14 +46,14 @@ export type {
   ListContactsOptions,
   ListContactsResponse,
   UpdateContactOptions,
-} from './audiences';
+} from './audiences'
 
 export type {
   CreateTemplateOptions,
   Template,
   TemplateListItem,
   UpdateTemplateOptions,
-} from './templates';
+} from './templates'
 
 export type {
   CreateWebhookOptions,
@@ -63,7 +63,7 @@ export type {
   WebhookDelivery,
   WebhookEvent,
   WebhookWithDeliveries,
-} from './webhooks';
+} from './webhooks'
 
 export type {
   Broadcast,
@@ -74,7 +74,7 @@ export type {
   SendBroadcastOptions,
   SendBroadcastResponse,
   UpdateBroadcastOptions,
-} from './broadcasts';
+} from './broadcasts'
 
 export type {
   CreateSuppressionOptions,
@@ -84,4 +84,4 @@ export type {
   SuppressionEntry,
   SuppressionImportItem,
   SuppressionReason,
-} from './suppressions';
+} from './suppressions'

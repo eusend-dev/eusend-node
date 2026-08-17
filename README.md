@@ -45,21 +45,21 @@ console.log(data?.id) // 9a8b7c6d-5e4f-4a3b-8c1d-0e9f8a7b6c5d (UUID)
 
 #### Options
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `from` | `string` | Sender address — a bare email or display-name form (`Acme <you@yourdomain.com>`). Must be from a verified domain. |
-| `to` | `string \| string[]` | Recipient(s). Maximum 50. |
-| `cc` | `string \| string[]` | CC recipient(s). Maximum 50. |
-| `bcc` | `string \| string[]` | BCC recipient(s). Maximum 50. |
-| `replyTo` | `string \| string[]` | Reply-to address(es). Maximum 50. |
-| `subject` | `string` | Email subject |
-| `html` | `string` | HTML body |
-| `text` | `string` | Plain text body |
-| `templateId` | `string` | ID of a saved template |
-| `variables` | `Record<string, unknown>` | Template variable substitutions |
-| `headers` | `Record<string, string>` | Custom email headers, written into the outbound message. Header names and values may not contain line breaks. |
-| `trackOpens` | `boolean` | Track open events. Omit to use your organization default |
-| `trackClicks` | `boolean` | Track click events. Omit to use your organization default |
+| Field         | Type                      | Description                                                                                                       |
+| ------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `from`        | `string`                  | Sender address — a bare email or display-name form (`Acme <you@yourdomain.com>`). Must be from a verified domain. |
+| `to`          | `string \| string[]`      | Recipient(s). Maximum 50.                                                                                         |
+| `cc`          | `string \| string[]`      | CC recipient(s). Maximum 50.                                                                                      |
+| `bcc`         | `string \| string[]`      | BCC recipient(s). Maximum 50.                                                                                     |
+| `replyTo`     | `string \| string[]`      | Reply-to address(es). Maximum 50.                                                                                 |
+| `subject`     | `string`                  | Email subject                                                                                                     |
+| `html`        | `string`                  | HTML body                                                                                                         |
+| `text`        | `string`                  | Plain text body                                                                                                   |
+| `templateId`  | `string`                  | ID of a saved template                                                                                            |
+| `variables`   | `Record<string, unknown>` | Template variable substitutions                                                                                   |
+| `headers`     | `Record<string, string>`  | Custom email headers, written into the outbound message. Header names and values may not contain line breaks.     |
+| `trackOpens`  | `boolean`                 | Track open events. Omit to use your organization default                                                          |
+| `trackClicks` | `boolean`                 | Track click events. Omit to use your organization default                                                         |
 
 At least one of `html`, `react`, `text`, or `templateId` is required.
 
@@ -133,8 +133,8 @@ console.log(data?.data) // [{ id: '...' }, { id: '...' }]
 ```ts
 const { data } = await client.emails.get('9a8b7c6d-5e4f-4a3b-8c1d-0e9f8a7b6c5d')
 
-console.log(data?.status)  // 'delivered'
-console.log(data?.events)  // [{ type: 'sent', ... }, { type: 'delivered', ... }]
+console.log(data?.status) // 'delivered'
+console.log(data?.events) // [{ type: 'sent', ... }, { type: 'delivered', ... }]
 ```
 
 ### List emails
@@ -142,7 +142,7 @@ console.log(data?.events)  // [{ type: 'sent', ... }, { type: 'delivered', ... }
 ```ts
 const { data } = await client.emails.list({ limit: 20 })
 
-console.log(data?.data)       // array of emails
+console.log(data?.data) // array of emails
 console.log(data?.nextCursor) // pass as cursor to fetch the next page
 ```
 
@@ -174,9 +174,9 @@ Available statuses: `queued` `sending` `sent` `delivered` `bounced` `complained`
 const { data } = await client.domains.create('yourdomain.com')
 
 // DNS records to add to your domain
-console.log(data?.dkim)   // { type: 'TXT', name: 'eusend._domainkey.yourdomain.com', value: '...' }
-console.log(data?.spf)    // { type: 'TXT', name: 'yourdomain.com', value: '...' }
-console.log(data?.dmarc)  // { type: 'TXT', name: '_dmarc.yourdomain.com', value: '...' }
+console.log(data?.dkim) // { type: 'TXT', name: 'eusend._domainkey.yourdomain.com', value: '...' }
+console.log(data?.spf) // { type: 'TXT', name: 'yourdomain.com', value: '...' }
+console.log(data?.dmarc) // { type: 'TXT', name: '_dmarc.yourdomain.com', value: '...' }
 ```
 
 ### Verify a domain
@@ -402,9 +402,9 @@ const { data } = await client.suppressions.import([
   { email: 'two@example.com', reason: 'complaint' },
 ])
 
-console.log(data?.count)              // written
+console.log(data?.count) // written
 console.log(data?.already_suppressed) // were already on the list
-console.log(data?.duplicates)         // repeated rows collapsed
+console.log(data?.duplicates) // repeated rows collapsed
 ```
 
 ### Remove an address
@@ -511,9 +511,9 @@ async function verifyWebhook(req: Request, secret: string): Promise<boolean> {
   const signature = req.headers.get('webhook-signature') ?? ''
 
   const body = await req.text()
-  const expected = 'v1,' + createHmac('sha256', secret)
-    .update(`${webhookId}.${timestamp}.${body}`)
-    .digest('base64')
+  const expected =
+    'v1,' +
+    createHmac('sha256', secret).update(`${webhookId}.${timestamp}.${body}`).digest('base64')
 
   return timingSafeEqual(Buffer.from(signature), Buffer.from(expected))
 }
@@ -523,7 +523,7 @@ async function verifyWebhook(req: Request, secret: string): Promise<boolean> {
 
 ```ts
 await client.webhooks.list()
-await client.webhooks.get(webhookId)    // includes recent deliveries
+await client.webhooks.get(webhookId) // includes recent deliveries
 await client.webhooks.update(webhookId, { events: ['email.bounced'] })
 await client.webhooks.delete(webhookId)
 ```
@@ -592,7 +592,7 @@ await client.broadcasts.cancel(broadcastId)
 
 ```ts
 await client.broadcasts.list()
-await client.broadcasts.get(broadcastId)   // includes delivery stats
+await client.broadcasts.get(broadcastId) // includes delivery stats
 await client.broadcasts.update(broadcastId, { subject: 'Updated subject' })
 await client.broadcasts.delete(broadcastId)
 ```
@@ -617,26 +617,26 @@ if (error) {
 
 #### Error codes
 
-| Code | Status | Description |
-|------|--------|-------------|
-| `UNAUTHORIZED` | 401 | Invalid or missing API key |
-| `FORBIDDEN` | 403 | Action not allowed on your plan |
-| `NOT_FOUND` | 404 | Resource not found |
-| `VALIDATION_ERROR` | 400 | Invalid request body |
-| `BAD_REQUEST` | 400 | Malformed request |
-| `CONFLICT` | 409 | Resource already exists |
-| `RATE_LIMITED` | 429 | Too many requests |
-| `MONTHLY_LIMIT_EXCEEDED` | 429 | Monthly send quota reached |
-| `DAILY_LIMIT_EXCEEDED` | 429 | Daily send ceiling reached (applies to all plans; ramps up as your account warms, resets midnight UTC) |
-| `PLAN_LIMIT_EXCEEDED` | 403 | Feature not available on your plan |
-| `DOMAIN_NOT_VERIFIED` | 403 | The sender domain is not verified for your organisation |
-| `SENDING_SUSPENDED` | 403 | Sending suspended for your account (high bounce or complaint rate) |
-| `LIST_SEND_HELD` | 403 | Past the unreviewed account's list-send allowance — the rest waits for review |
-| `BROADCAST_HELD` | 403 | Broadcast used its unreviewed allowance; the remainder waits for review |
-| `ALL_SUPPRESSED` | 422 | All recipients are on the suppression list |
-| `SERVICE_PAUSED` | 503 | Sending is temporarily paused platform-wide |
-| `INTERNAL_ERROR` | 500 | Server error |
-| `application_error` | `null` | Network failure — request never reached the server |
+| Code                     | Status | Description                                                                                            |
+| ------------------------ | ------ | ------------------------------------------------------------------------------------------------------ |
+| `UNAUTHORIZED`           | 401    | Invalid or missing API key                                                                             |
+| `FORBIDDEN`              | 403    | Action not allowed on your plan                                                                        |
+| `NOT_FOUND`              | 404    | Resource not found                                                                                     |
+| `VALIDATION_ERROR`       | 400    | Invalid request body                                                                                   |
+| `BAD_REQUEST`            | 400    | Malformed request                                                                                      |
+| `CONFLICT`               | 409    | Resource already exists                                                                                |
+| `RATE_LIMITED`           | 429    | Too many requests                                                                                      |
+| `MONTHLY_LIMIT_EXCEEDED` | 429    | Monthly send quota reached                                                                             |
+| `DAILY_LIMIT_EXCEEDED`   | 429    | Daily send ceiling reached (applies to all plans; ramps up as your account warms, resets midnight UTC) |
+| `PLAN_LIMIT_EXCEEDED`    | 403    | Feature not available on your plan                                                                     |
+| `DOMAIN_NOT_VERIFIED`    | 403    | The sender domain is not verified for your organisation                                                |
+| `SENDING_SUSPENDED`      | 403    | Sending suspended for your account (high bounce or complaint rate)                                     |
+| `LIST_SEND_HELD`         | 403    | Past the unreviewed account's list-send allowance — the rest waits for review                          |
+| `BROADCAST_HELD`         | 403    | Broadcast used its unreviewed allowance; the remainder waits for review                                |
+| `ALL_SUPPRESSED`         | 422    | All recipients are on the suppression list                                                             |
+| `SERVICE_PAUSED`         | 503    | Sending is temporarily paused platform-wide                                                            |
+| `INTERNAL_ERROR`         | 500    | Server error                                                                                           |
+| `application_error`      | `null` | Network failure — request never reached the server                                                     |
 
 ---
 
