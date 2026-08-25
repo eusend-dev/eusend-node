@@ -72,7 +72,8 @@ export interface Broadcast {
   id: string
   name: string
   status: BroadcastStatus
-  audienceId: string
+  /** Null after the audience is deleted from a finished or draft broadcast. */
+  audienceId: string | null
   fromAddress: string
   subject: string
   html: string | null
@@ -89,7 +90,8 @@ export interface BroadcastListItem {
   id: string
   name: string
   status: BroadcastStatus
-  audienceId: string
+  /** Null after the audience is deleted from a finished or draft broadcast. */
+  audienceId: string | null
   fromAddress: string
   subject: string
   recipientCount: number | null
