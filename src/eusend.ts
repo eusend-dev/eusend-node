@@ -10,7 +10,7 @@ import { Broadcasts } from './broadcasts'
 import { Suppressions } from './suppressions'
 
 const DEFAULT_BASE_URL = 'https://api.eusend.dev'
-const SDK_VERSION = '0.8.0'
+const SDK_VERSION = '0.11.2'
 
 export interface EusendOptions {
   baseUrl?: string
