@@ -70,16 +70,25 @@ export interface SendBroadcastOptions {
 
 export interface Broadcast {
   id: string
+  organizationId: string
   name: string
   status: BroadcastStatus
-  /** Null after the audience is deleted from a finished or draft broadcast. */
+  /** Null when the associated audience has been deleted. */
   audienceId: string | null
   fromAddress: string
+  replyTo: string | null
   subject: string
   html: string | null
+  reactSource: string | null
+  editorJson: Record<string, unknown> | null
   templateId: string | null
   templateVariables: Record<string, string> | null
+  heldReason: string | null
   scheduledAt: string | null
+  startedAt: string | null
+  completedAt: string | null
+  recipientCount: number | null
+  sentCount: number | null
   trackOpens: boolean
   trackClicks: boolean
   createdAt: string
@@ -90,7 +99,7 @@ export interface BroadcastListItem {
   id: string
   name: string
   status: BroadcastStatus
-  /** Null after the audience is deleted from a finished or draft broadcast. */
+  /** Null when the associated audience has been deleted. */
   audienceId: string | null
   fromAddress: string
   subject: string
@@ -104,10 +113,6 @@ export interface BroadcastListItem {
 }
 
 export interface BroadcastDetail extends Broadcast {
-  recipientCount: number | null
-  sentCount: number | null
-  startedAt: string | null
-  completedAt: string | null
   stats: Record<string, number>
 }
 
