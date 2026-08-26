@@ -27,6 +27,7 @@ export type {
   Domain,
   DomainListItem,
   DomainStatus,
+  DomainVerification,
 } from './domains'
 
 export type {

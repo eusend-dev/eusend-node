@@ -37,6 +37,13 @@ export interface DomainListItem {
   createdAt: string
 }
 
+/** Whether a verification chain is polling DNS for this domain right now. */
+export interface DomainVerification {
+  running: boolean
+  /** When the running chain started, or null when none is. */
+  startedAt: string | null
+}
+
 export interface Domain {
   id: string
   name: string
@@ -45,6 +52,7 @@ export interface Domain {
   status: DomainStatus
   createdAt: string
   verifiedAt: string | null
+  verification: DomainVerification
 }
 
 export class Domains {
