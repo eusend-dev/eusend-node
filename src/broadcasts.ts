@@ -116,6 +116,24 @@ export interface BroadcastDetail extends Broadcast {
   stats: Record<string, number>
 }
 
+export interface TestBroadcastOptions {
+  /**
+   * Up to 5 addresses, each on a domain verified on your account. A test send delivers
+   * real mail without the paid-plan gate that `send()` carries, so it is restricted to
+   * inboxes you have already proved you control; anything else returns
+   * `DOMAIN_NOT_VERIFIED`.
+   */
+  to: string[]
+}
+
+export interface TestBroadcastResponse {
+  id: string
+  /** The addresses actually mailed, lowercased and de-duplicated. */
+  sentTo: string[]
+  /** One email id per recipient, for looking the delivery up in the logs. */
+  emailIds: string[]
+}
+
 export interface SendBroadcastResponse {
   id: string
   status: 'sending' | 'scheduled'
@@ -191,6 +209,35 @@ export class Broadcasts {
     if (res.error) return res
     return {
       data: { id: res.data.id, status: res.data.status, scheduledAt: res.data.scheduled_at },
+      error: null,
+      headers: res.headers,
+    }
+  }
+
+  /**
+   * Send yourself a copy before the campaign goes out — the real message through the real
+   * sending path, so it shows what a recipient will see.
+   *
+   * Works on every plan including Free, unlike `send()`. It costs daily and monthly quota
+   * like any other send, and does NOT move the broadcast's status: the campaign stays a
+   * draft no matter how many tests you send.
+   *
+   * Requires a LIVE api key. "Test" here means a dress rehearsal, not a sandbox — a
+   * `eu_test_` key is refused because the mail really is delivered.
+   */
+  async test(
+    id: string,
+    options: TestBroadcastOptions,
+  ): Promise<EusendResponse<TestBroadcastResponse>> {
+    // Snake-cased on the wire, like the send() response above.
+    const res = await this.client.post<{
+      id: string
+      sent_to: string[]
+      email_ids: string[]
+    }>(`/broadcasts/${id}/test`, { to: options.to })
+    if (res.error) return res
+    return {
+      data: { id: res.data.id, sentTo: res.data.sent_to, emailIds: res.data.email_ids },
       error: null,
       headers: res.headers,
     }

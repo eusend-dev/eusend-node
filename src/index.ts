@@ -74,6 +74,8 @@ export type {
   CreateBroadcastOptions,
   SendBroadcastOptions,
   SendBroadcastResponse,
+  TestBroadcastOptions,
+  TestBroadcastResponse,
   UpdateBroadcastOptions,
 } from './broadcasts'
 
