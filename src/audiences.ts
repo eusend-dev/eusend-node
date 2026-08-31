@@ -148,6 +148,27 @@ export class Audiences {
    * de-duplicated server-side; `count` is the number of rows written and
    * `duplicates` how many repeated addresses were collapsed to get there.
    */
+  /**
+   * Delete up to 1,000 contacts from an audience by id.
+   *
+   * `deleted` may be lower than the number of ids sent — an id may already be gone, or
+   * may belong to another audience — so a retry after a dropped response settles at 0
+   * rather than failing.
+   *
+   * This is not an unsubscribe. It removes them from the audience without adding them to
+   * the suppression list; use `updateContact({ unsubscribed: true })` to stop mailing
+   * somebody while keeping the record.
+   */
+  batchDeleteContacts(
+    audienceId: string,
+    contactIds: string[],
+  ): Promise<EusendResponse<{ deleted: number }>> {
+    return this.client.post<{ deleted: number }>(
+      `/audiences/${audienceId}/contacts/batch-delete`,
+      { contact_ids: contactIds },
+    )
+  }
+
   batchCreateContacts(
     audienceId: string,
     options: BatchCreateContactsOptions,
