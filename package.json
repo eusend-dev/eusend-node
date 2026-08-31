@@ -1,6 +1,6 @@
 {
   "name": "@eusend_dev/sdk",
-  "version": "0.11.4",
+  "version": "0.12.0",
   "description": "Official Node.js SDK for the Eusend API",
   "author": "Eusend",
   "license": "MIT",
