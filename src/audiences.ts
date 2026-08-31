@@ -54,8 +54,25 @@ export interface ListContactsResponse {
   nextCursor: string | null
 }
 
+/**
+ * A contact in a bulk import. Extends the single-create shape with the two fields that
+ * only make sense when migrating a list in from somewhere else.
+ */
+export interface BatchContactOptions extends CreateContactOptions {
+  /**
+   * Mark the contact as opted out, so a list moved from another provider keeps its
+   * unsubscribes. An import can only ever ADD an opt-out: passing `false` will not
+   * re-subscribe someone who has already unsubscribed. Use `updateContact` for that,
+   * one contact at a time.
+   */
+  unsubscribed?: boolean
+  /** Original signup time (ISO 8601). Applied on insert only — an existing contact
+   *  keeps the date it already has. */
+  createdAt?: string
+}
+
 export interface BatchCreateContactsOptions {
-  contacts: CreateContactOptions[]
+  contacts: BatchContactOptions[]
 }
 
 export class Audiences {
@@ -142,6 +159,8 @@ export class Audiences {
           email: c.email,
           first_name: c.firstName,
           last_name: c.lastName,
+          unsubscribed: c.unsubscribed,
+          created_at: c.createdAt,
         })),
       },
     )

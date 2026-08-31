@@ -40,6 +40,7 @@ export type {
 export type {
   Audience,
   AudienceListItem,
+  BatchContactOptions,
   BatchCreateContactsOptions,
   Contact,
   ContactStatus,
