@@ -24,6 +24,8 @@ export interface Contact {
   email: string
   firstName: string | null
   lastName: string | null
+  /** Custom properties, available as `{{key}}` in a broadcast body. */
+  properties: Record<string, string>
   status: ContactStatus
   unsubscribedAt: string | null
   createdAt: string
@@ -34,12 +36,27 @@ export interface CreateContactOptions {
   email: string
   firstName?: string
   lastName?: string
+  /**
+   * Custom properties, merged into the `{{variable}}` map when a broadcast renders, so
+   * `{ plan: 'pro' }` makes `{{plan}}` resolve to `pro`.
+   *
+   * Values are strings; keys are lowercase letters, digits and underscores, starting with
+   * a letter (at most 40 characters, 20 properties per contact). `email`, `name`,
+   * `first_name`, `last_name` and `full_name` are built in and cannot be used.
+   *
+   * Sending this REPLACES the contact's properties. Omitting it on `createContact` clears
+   * them; omitting it on `updateContact` leaves them untouched.
+   */
+  properties?: Record<string, string>
 }
 
 export interface UpdateContactOptions {
   firstName?: string
   lastName?: string
   unsubscribed?: boolean
+  /** Replaces the contact's custom properties. Omit to leave them unchanged; pass `{}` to
+   *  clear them. See {@link CreateContactOptions.properties} for the naming rules. */
+  properties?: Record<string, string>
 }
 
 export interface ListContactsOptions {
@@ -69,6 +86,12 @@ export interface BatchContactOptions extends CreateContactOptions {
   /** Original signup time (ISO 8601). Applied on insert only — an existing contact
    *  keeps the date it already has. */
   createdAt?: string
+  /**
+   * Unlike `createContact`, an import MERGES properties into whatever the contact already
+   * has — a CSV carrying only `plan` will not drop a `company` an earlier import set. To
+   * replace the whole object, use `updateContact`.
+   */
+  properties?: Record<string, string>
 }
 
 export interface BatchCreateContactsOptions {
@@ -100,6 +123,7 @@ export class Audiences {
       email: options.email,
       first_name: options.firstName,
       last_name: options.lastName,
+      properties: options.properties,
     })
   }
 
@@ -131,6 +155,7 @@ export class Audiences {
       first_name: options.firstName,
       last_name: options.lastName,
       unsubscribed: options.unsubscribed,
+      properties: options.properties,
     })
   }
 
@@ -182,6 +207,7 @@ export class Audiences {
           last_name: c.lastName,
           unsubscribed: c.unsubscribed,
           created_at: c.createdAt,
+          properties: c.properties,
         })),
       },
     )

@@ -292,10 +292,17 @@ const { data } = await client.audiences.createContact(audienceId, {
   email: 'user@example.com',
   firstName: 'Jane',
   lastName: 'Smith',
+  // Custom properties become {{plan}} and {{company}} in a broadcast body.
+  properties: { plan: 'pro', company: 'Acme' },
 })
 ```
 
 If a contact with that email already exists in the audience, it will be updated instead.
+
+Property names are lowercase letters, digits and underscores starting with a letter (20
+per contact, values up to 500 characters). `email`, `name`, `first_name`, `last_name` and
+`full_name` are built in and are rejected as property names. `createContact` and
+`updateContact` replace the whole `properties` object; `batchCreateContacts` merges.
 
 ### Bulk import contacts
 
