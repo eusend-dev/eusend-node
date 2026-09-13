@@ -44,6 +44,33 @@ export interface DomainVerification {
   startedAt: string | null
 }
 
+/**
+ * What the last unmatched DNS check found, when it found a mistake rather than an absence.
+ *
+ * `code` is the mistake: `doubled_domain` (the record sits under the domain twice, because the
+ * control panel appends it to whatever you type), `truncated_key` (the value was cut at the
+ * 255-character limit for a single DNS string instead of being split into two), `foreign_key`
+ * (a DKIM key we did not issue is published at the selector), `quoted_value`, `multiple_records`,
+ * `cname_at_selector`. New codes may be added, so treat an unknown one as generic.
+ */
+export interface DomainDiagnostic {
+  code: string
+  /** The name the record was actually found at, for `doubled_domain`. */
+  foundAt?: string
+  /** How much of the key is published, and how much there is, for `truncated_key`. */
+  publishedChars?: number
+  expectedChars?: number
+  /** Where the CNAME points, for `cname_at_selector`. */
+  target?: string
+  /** The DNS host serving the zone, when its nameservers named one we recognise. */
+  provider?: {
+    id: string
+    label: string
+    /** Path to the guide for this panel on eusend.dev, or null where there is none. */
+    guide: string | null
+  }
+}
+
 export interface Domain {
   id: string
   name: string
@@ -53,6 +80,8 @@ export interface Domain {
   createdAt: string
   verifiedAt: string | null
   verification: DomainVerification
+  /** Null while nothing is wrong beyond the records not having propagated yet. */
+  diagnostic: DomainDiagnostic | null
 }
 
 export class Domains {

@@ -25,6 +25,7 @@ export type {
   CreateDomainResponse,
   DnsRecord,
   Domain,
+  DomainDiagnostic,
   DomainListItem,
   DomainStatus,
   DomainVerification,
