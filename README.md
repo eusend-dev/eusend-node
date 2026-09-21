@@ -369,6 +369,53 @@ await client.audiences.deleteContact(audienceId, contactId)
 
 ---
 
+## Contact properties
+
+The custom fields your contacts carry — the `{{variables}}` a broadcast can personalize on.
+
+Declaring a property is optional: one you send on a contact without ever declaring it
+registers itself as a `string`, so existing code needs no changes. Declaring it is what
+gives it a type and a fallback value.
+
+### Declare a property
+
+```ts
+await client.contactProperties.create({
+  key: 'plan',
+  type: 'string', // or 'number' — a write-time check, not formatting
+  fallbackValue: 'free', // rendered for contacts with no value of their own
+})
+```
+
+### List properties
+
+```ts
+const { data } = await client.contactProperties.list()
+// [{ id, key, type, fallbackValue, createdAt, updatedAt }]
+```
+
+### Update a property
+
+```ts
+await client.contactProperties.update(propertyId, { fallbackValue: 'trial' })
+```
+
+The fallback is the only mutable field. Renaming or retyping would have to rewrite every
+contact *and* every broadcast body spelling `{{old_key}}`, so both are a delete and a
+create.
+
+### Delete a property
+
+```ts
+const { data } = await client.contactProperties.delete(propertyId)
+// { deleted: true, contactsUpdated: 1240 }
+```
+
+Deletes the definition **and** strips the key from every contact in the organization. Not
+undoable.
+
+---
+
 ## Suppressions
 
 Addresses the account will not send to. Hard bounces and spam complaints are added

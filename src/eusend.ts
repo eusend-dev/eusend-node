@@ -4,6 +4,7 @@ import { Batch } from './batch'
 import { Domains } from './domains'
 import { ApiKeys } from './api-keys'
 import { Audiences } from './audiences'
+import { ContactProperties } from './contact-properties'
 import { Templates } from './templates'
 import { Webhooks } from './webhooks'
 import { Broadcasts } from './broadcasts'
@@ -26,6 +27,8 @@ export class Eusend {
   readonly domains: Domains
   readonly apiKeys: ApiKeys
   readonly audiences: Audiences
+  /** The org's declared contact properties — `client.contactProperties.list()`. */
+  readonly contactProperties: ContactProperties
   readonly templates: Templates
   readonly webhooks: Webhooks
   readonly broadcasts: Broadcasts
@@ -47,6 +50,7 @@ export class Eusend {
     this.domains = new Domains(this)
     this.apiKeys = new ApiKeys(this)
     this.audiences = new Audiences(this)
+    this.contactProperties = new ContactProperties(this)
     this.templates = new Templates(this)
     this.webhooks = new Webhooks(this)
     this.broadcasts = new Broadcasts(this)

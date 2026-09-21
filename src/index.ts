@@ -52,6 +52,14 @@ export type {
 } from './audiences'
 
 export type {
+  ContactProperty,
+  ContactPropertyType,
+  CreateContactPropertyOptions,
+  DeleteContactPropertyResponse,
+  UpdateContactPropertyOptions,
+} from './contact-properties'
+
+export type {
   CreateTemplateOptions,
   Template,
   TemplateListItem,
