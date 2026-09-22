@@ -60,6 +60,17 @@ export type {
 } from './contact-properties'
 
 export type {
+  ClearTopicSubscriptionResponse,
+  CreateTopicOptions,
+  DeleteTopicResponse,
+  Topic,
+  TopicDefaultSubscription,
+  TopicSubscriptionResponse,
+  TopicVisibility,
+  UpdateTopicOptions,
+} from './topics'
+
+export type {
   CreateTemplateOptions,
   Template,
   TemplateListItem,

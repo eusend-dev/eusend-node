@@ -12,6 +12,9 @@ export type BroadcastStatus =
 export interface CreateBroadcastOptions {
   name: string
   audienceId: string
+  /** Narrows the audience to the contacts subscribed to this topic. Omit to send to all
+   *  of it. */
+  topicId?: string
   /**
    * Sender address. Accepts a bare email (`onboarding@eusend.dev`) or a display-name
    * form (`Acme <onboarding@eusend.dev>`). The domain must be verified on your account.
@@ -42,6 +45,8 @@ export interface CreateBroadcastOptions {
 export interface UpdateBroadcastOptions {
   name?: string
   audienceId?: string
+  /** Pass null to clear the topic and widen the send back to the whole audience. */
+  topicId?: string | null
   from?: string
   subject?: string
   html?: string
@@ -75,6 +80,8 @@ export interface Broadcast {
   status: BroadcastStatus
   /** Null when the associated audience has been deleted. */
   audienceId: string | null
+  /** The topic this broadcast is scoped to, or null for the whole audience. */
+  topicId: string | null
   fromAddress: string
   replyTo: string | null
   subject: string
@@ -101,6 +108,8 @@ export interface BroadcastListItem {
   status: BroadcastStatus
   /** Null when the associated audience has been deleted. */
   audienceId: string | null
+  topicId: string | null
+  topicName: string | null
   fromAddress: string
   subject: string
   recipientCount: number | null
@@ -157,6 +166,7 @@ export class Broadcasts {
     return this.client.post<Broadcast>('/broadcasts', {
       name: options.name,
       audience_id: options.audienceId,
+      topic_id: options.topicId,
       from: options.from,
       subject: options.subject,
       html,
@@ -182,6 +192,7 @@ export class Broadcasts {
     return this.client.patch<Broadcast>(`/broadcasts/${id}`, {
       name: options.name,
       audience_id: options.audienceId,
+      topic_id: options.topicId,
       from: options.from,
       subject: options.subject,
       html,

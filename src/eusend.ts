@@ -5,6 +5,7 @@ import { Domains } from './domains'
 import { ApiKeys } from './api-keys'
 import { Audiences } from './audiences'
 import { ContactProperties } from './contact-properties'
+import { Topics } from './topics'
 import { Templates } from './templates'
 import { Webhooks } from './webhooks'
 import { Broadcasts } from './broadcasts'
@@ -29,6 +30,8 @@ export class Eusend {
   readonly audiences: Audiences
   /** The org's declared contact properties — `client.contactProperties.list()`. */
   readonly contactProperties: ContactProperties
+  /** Subscription topics — `client.topics.list()`. */
+  readonly topics: Topics
   readonly templates: Templates
   readonly webhooks: Webhooks
   readonly broadcasts: Broadcasts
@@ -51,6 +54,7 @@ export class Eusend {
     this.apiKeys = new ApiKeys(this)
     this.audiences = new Audiences(this)
     this.contactProperties = new ContactProperties(this)
+    this.topics = new Topics(this)
     this.templates = new Templates(this)
     this.webhooks = new Webhooks(this)
     this.broadcasts = new Broadcasts(this)
@@ -130,6 +134,13 @@ export class Eusend {
   patch<T>(path: string, body?: unknown): Promise<EusendResponse<T>> {
     return this.fetchRequest<T>(path, {
       method: 'PATCH',
+      body: body != null ? JSON.stringify(body) : undefined,
+    })
+  }
+
+  put<T>(path: string, body?: unknown): Promise<EusendResponse<T>> {
+    return this.fetchRequest<T>(path, {
+      method: 'PUT',
       body: body != null ? JSON.stringify(body) : undefined,
     })
   }
