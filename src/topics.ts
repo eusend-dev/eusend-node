@@ -85,8 +85,9 @@ export class Topics {
     })
   }
 
-  /** Deletes the topic and every stored preference for it. A draft or scheduled broadcast
-   *  scoped to it widens back to its whole audience. */
+  /** Deletes the topic and every stored preference for it. A draft broadcast scoped to it
+   *  widens back to its whole audience; returns 409 while a broadcast that is scheduled or
+   *  has not finished sending still uses the topic. */
   delete(id: string): Promise<EusendResponse<DeleteTopicResponse>> {
     return this.client.delete<DeleteTopicResponse>(`/topics/${id}`)
   }

@@ -128,6 +128,12 @@ const { data } = await client.batch.send([
 console.log(data?.data) // [{ id: '...' }, { id: '...' }]
 ```
 
+Pass an `idempotencyKey` as the second argument to retry a batch safely. The key is applied per item by position, so a retry must send the items in the same order.
+
+```ts
+await client.batch.send(emails, { idempotencyKey: `digest-${runId}` })
+```
+
 ### Retrieve an email
 
 ```ts
@@ -204,8 +210,11 @@ const { data } = await client.domains.get(domainId)
 ### Delete a domain
 
 ```ts
-await client.domains.delete(domainId)
+const { data } = await client.domains.delete(domainId)
+// { message, canceled_scheduled_emails }
 ```
+
+Scheduled emails from the domain are canceled, since it can no longer send them.
 
 ---
 
@@ -277,6 +286,19 @@ const audienceId = data!.id
 ```ts
 const { data } = await client.audiences.list()
 // [{ id, name, createdAt, contactCount }]
+```
+
+### Retrieve an audience
+
+```ts
+const { data } = await client.audiences.get(audienceId)
+// { id, name, createdAt, updatedAt, contactCount }
+```
+
+### Rename an audience
+
+```ts
+await client.audiences.update(audienceId, { name: 'Product updates' })
 ```
 
 ### Delete an audience
@@ -548,7 +570,7 @@ console.log(data?.secret) // signing secret — only returned once, store it sec
 
 Pass `'*'` in the events array to subscribe to all events.
 
-Available events: `email.sent` `email.delivered` `email.bounced` `email.complained` `email.opened` `email.clicked`
+Available events: `email.sent` `email.delivered` `email.bounced` `email.complained` `email.opened` `email.clicked` `email.failed` `email.suppressed`
 
 **Endpoint requirements:** the `url` must be a public `http(s)` endpoint — private, loopback, and internal addresses are rejected, both at creation and (after DNS resolution) before each delivery. Your endpoint must respond directly with a `2xx`; redirects (`3xx`) are not followed and are treated as a failed delivery.
 
@@ -595,6 +617,7 @@ const { data } = await client.broadcasts.create({
   name: 'May newsletter',
   audienceId: '550e8400-e29b-41d4-a716-446655440000',
   from: 'Sivert <hello@yourdomain.com>',
+  replyTo: 'support@yourdomain.com',
   subject: 'May update',
   html: '<p>Hi {{first_name}}, your monthly update is here...</p>',
 })

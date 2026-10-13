@@ -20,6 +20,8 @@ export interface CreateBroadcastOptions {
    * form (`Acme <onboarding@eusend.dev>`). The domain must be verified on your account.
    */
   from: string
+  /** Where replies go. Same formats as `from`; omit to have replies go to the sender. */
+  replyTo?: string
   subject: string
   html?: string
   /**
@@ -48,6 +50,8 @@ export interface UpdateBroadcastOptions {
   /** Pass null to clear the topic and widen the send back to the whole audience. */
   topicId?: string | null
   from?: string
+  /** Pass null to clear it, so replies go back to the sender. */
+  replyTo?: string | null
   subject?: string
   html?: string
   /**
@@ -168,6 +172,7 @@ export class Broadcasts {
       audience_id: options.audienceId,
       topic_id: options.topicId,
       from: options.from,
+      reply_to: options.replyTo,
       subject: options.subject,
       html,
       template_id: options.templateId,
@@ -187,6 +192,11 @@ export class Broadcasts {
     return this.client.get<BroadcastDetail>(`/broadcasts/${id}`)
   }
 
+  /**
+   * An update that leaves the broadcast scheduled — setting `scheduledAt`, or editing one
+   * that already is — runs the same checks as `send()` and can return the same 403s.
+   * Unscheduling with `scheduledAt: null` is always allowed.
+   */
   async update(id: string, options: UpdateBroadcastOptions): Promise<EusendResponse<Broadcast>> {
     const html = await resolveBroadcastHtml(options)
     return this.client.patch<Broadcast>(`/broadcasts/${id}`, {
@@ -194,6 +204,7 @@ export class Broadcasts {
       audience_id: options.audienceId,
       topic_id: options.topicId,
       from: options.from,
+      reply_to: options.replyTo,
       subject: options.subject,
       html,
       template_id: options.templateId,

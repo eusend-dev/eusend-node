@@ -23,6 +23,7 @@ export type {
 
 export type {
   CreateDomainResponse,
+  DeleteDomainResponse,
   DnsRecord,
   Domain,
   DomainDiagnostic,
@@ -41,6 +42,8 @@ export type {
 export type {
   Audience,
   AudienceListItem,
+  AudienceDetail,
+  UpdateAudienceOptions,
   BatchContactOptions,
   BatchCreateContactsOptions,
   Contact,

@@ -84,6 +84,12 @@ export interface Domain {
   diagnostic: DomainDiagnostic | null
 }
 
+export interface DeleteDomainResponse {
+  message: string
+  /** Scheduled emails from this domain that were canceled because it can no longer send. */
+  canceled_scheduled_emails: number
+}
+
 export class Domains {
   constructor(private readonly client: Eusend) {}
 
@@ -99,8 +105,8 @@ export class Domains {
     return this.client.get<Domain>(`/domains/${id}`)
   }
 
-  delete(id: string): Promise<EusendResponse<{ message: string }>> {
-    return this.client.delete<{ message: string }>(`/domains/${id}`)
+  delete(id: string): Promise<EusendResponse<DeleteDomainResponse>> {
+    return this.client.delete<DeleteDomainResponse>(`/domains/${id}`)
   }
 
   verify(id: string): Promise<EusendResponse<{ message: string }>> {

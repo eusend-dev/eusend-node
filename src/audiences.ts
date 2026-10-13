@@ -18,6 +18,14 @@ export interface AudienceListItem {
   contactCount: number
 }
 
+export interface AudienceDetail extends AudienceListItem {
+  updatedAt: string
+}
+
+export interface UpdateAudienceOptions {
+  name: string
+}
+
 export interface Contact {
   id: string
   audienceId: string
@@ -109,6 +117,15 @@ export class Audiences {
     const res = await this.client.get<{ data: AudienceListItem[] }>('/audiences')
     if (res.error) return res
     return { data: res.data.data, error: null, headers: res.headers }
+  }
+
+  get(id: string): Promise<EusendResponse<AudienceDetail>> {
+    return this.client.get<AudienceDetail>(`/audiences/${id}`)
+  }
+
+  /** Rename an audience. */
+  update(id: string, options: UpdateAudienceOptions): Promise<EusendResponse<Audience>> {
+    return this.client.patch<Audience>(`/audiences/${id}`, { name: options.name })
   }
 
   delete(id: string): Promise<EusendResponse<Record<string, never>>> {

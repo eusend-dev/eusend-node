@@ -8,6 +8,8 @@ export type WebhookEvent =
   | 'email.complained'
   | 'email.opened'
   | 'email.clicked'
+  | 'email.failed'
+  | 'email.suppressed'
   | '*'
 
 export interface CreateWebhookOptions {

@@ -288,7 +288,10 @@ export class Emails {
     return this.client.get<Email>(`/emails/${id}`)
   }
 
-  /** Reschedule a scheduled email. Fails once the email has started sending. */
+  /**
+   * Reschedule a scheduled email. Fails once the email has started sending, and returns
+   * 429 `DAILY_LIMIT_EXCEEDED` when the new day's sending quota is already used up.
+   */
   async update(
     id: string,
     options: UpdateEmailOptions,
