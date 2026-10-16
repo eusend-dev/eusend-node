@@ -86,7 +86,16 @@ export interface SendEmailOptions {
    * event for this send.
    */
   tags?: EmailTags
+  /**
+   * Embed an open-tracking pixel. Omit to use your organization's default (Settings →
+   * General → Email tracking), which is off unless you changed it.
+   */
   trackOpens?: boolean
+  /**
+   * Rewrite links through eusend so clicks are recorded. Omit to use your organization's
+   * default, which is off unless you changed it. Rewritten links can hurt inbox placement,
+   * so leave this off for sign-in links and password resets.
+   */
   trackClicks?: boolean
   /** File attachments. Up to 20 per message, 10 MB combined. */
   attachments?: Attachment[]

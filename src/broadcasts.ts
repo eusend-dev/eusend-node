@@ -34,12 +34,13 @@ export interface CreateBroadcastOptions {
   templateVariables?: Record<string, string>
   /**
    * Embed the open-tracking pixel for this broadcast. Omit to use your organization's
-   * default (Settings → General → Email tracking); `false` always wins over it.
+   * default (Settings → General → Email tracking), which is off unless you changed it. An
+   * explicit value always wins over it.
    */
   trackOpens?: boolean
   /**
-   * Rewrite links so clicks are recorded. Omit to use your organization's default;
-   * `false` leaves the original URLs untouched in the delivered mail.
+   * Rewrite links so clicks are recorded. Omit to use your organization's default (off
+   * unless you changed it); `false` leaves the original URLs untouched in the delivered mail.
    */
   trackClicks?: boolean
 }
@@ -63,12 +64,13 @@ export interface UpdateBroadcastOptions {
   scheduledAt?: string | null
   /**
    * Embed the open-tracking pixel for this broadcast. Omit to use your organization's
-   * default (Settings → General → Email tracking); `false` always wins over it.
+   * default (Settings → General → Email tracking), which is off unless you changed it. An
+   * explicit value always wins over it.
    */
   trackOpens?: boolean
   /**
-   * Rewrite links so clicks are recorded. Omit to use your organization's default;
-   * `false` leaves the original URLs untouched in the delivered mail.
+   * Rewrite links so clicks are recorded. Omit to use your organization's default (off
+   * unless you changed it); `false` leaves the original URLs untouched in the delivered mail.
    */
   trackClicks?: boolean
 }
