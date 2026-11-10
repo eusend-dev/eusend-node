@@ -704,7 +704,7 @@ if (error) {
 | `CONFLICT`               | 409    | Resource already exists                                                                                |
 | `RATE_LIMITED`           | 429    | Too many requests                                                                                      |
 | `MONTHLY_LIMIT_EXCEEDED` | 429    | Monthly send quota reached                                                                             |
-| `DAILY_LIMIT_EXCEEDED`   | 429    | Daily send ceiling reached (applies to all plans; ramps up as your account warms, resets midnight UTC) |
+| `DAILY_LIMIT_EXCEEDED`   | 429    | Daily recipient ceiling reached — to, cc and bcc all count (resets midnight UTC)                       |
 | `PLAN_LIMIT_EXCEEDED`    | 403    | Feature not available on your plan                                                                     |
 | `DOMAIN_NOT_VERIFIED`    | 403    | The sender domain is not verified for your organisation                                                |
 | `SENDING_SUSPENDED`      | 403    | Sending suspended for your account (high bounce or complaint rate)                                     |
