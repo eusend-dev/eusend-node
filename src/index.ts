@@ -87,6 +87,7 @@ export type {
   Webhook,
   WebhookDelivery,
   WebhookEvent,
+  WebhookTestResponse,
   WebhookWithDeliveries,
 } from './webhooks'
 

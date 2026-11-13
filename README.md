@@ -601,6 +601,8 @@ async function verifyWebhook(req: Request, secret: string): Promise<boolean> {
 await client.webhooks.list()
 await client.webhooks.get(webhookId) // includes recent deliveries
 await client.webhooks.update(webhookId, { events: ['email.bounced'] })
+await client.webhooks.update(webhookId, { enabled: true }) // re-enable a paused or auto-disabled endpoint
+await client.webhooks.test(webhookId) // send a signed webhook.test event
 await client.webhooks.delete(webhookId)
 ```
 

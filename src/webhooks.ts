@@ -20,6 +20,8 @@ export interface CreateWebhookOptions {
 export interface UpdateWebhookOptions {
   url?: string
   events?: WebhookEvent[]
+  /** `false` pauses the endpoint; `true` re-enables a paused or auto-disabled one. */
+  enabled?: boolean
 }
 
 export interface WebhookDelivery {
@@ -39,7 +41,16 @@ export interface Webhook {
   id: string
   url: string
   events: WebhookEvent[]
+  /** When the endpoint stopped receiving events; `null` while active. */
+  disabledAt: string | null
+  /** `failing` after three days of failed deliveries, `manual` when paused. */
+  disabledReason: 'failing' | 'manual' | null
   createdAt: string
+}
+
+export interface WebhookTestResponse {
+  /** The id of the test delivery, as it appears in the webhook's deliveries. */
+  id: string
 }
 
 export interface WebhookWithDeliveries extends Webhook {
@@ -74,7 +85,13 @@ export class Webhooks {
     return this.client.patch<Webhook>(`/webhooks/${id}`, {
       url: options.url,
       events: options.events,
+      enabled: options.enabled,
     })
+  }
+
+  /** Send one signed `webhook.test` event to the endpoint. Works on a disabled endpoint. */
+  test(id: string): Promise<EusendResponse<WebhookTestResponse>> {
+    return this.client.post<WebhookTestResponse>(`/webhooks/${id}/test`)
   }
 
   delete(id: string): Promise<EusendResponse<Record<string, never>>> {
