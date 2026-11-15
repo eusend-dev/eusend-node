@@ -724,7 +724,7 @@ if (error) {
 | `DAILY_LIMIT_EXCEEDED`   | 429    | Daily recipient ceiling reached — to, cc and bcc all count (resets midnight UTC)                       |
 | `PLAN_LIMIT_EXCEEDED`    | 403    | Feature not available on your plan                                                                     |
 | `DOMAIN_NOT_VERIFIED`    | 403    | The sender domain is not verified for your organisation                                                |
-| `SENDING_SUSPENDED`      | 403    | Sending suspended for your account (high bounce or complaint rate)                                     |
+| `SENDING_SUSPENDED`      | 403    | Sending is suspended for this account — contact support                                                |
 | `LIST_SEND_HELD`         | 403    | Past the unreviewed account's list-send allowance — the rest waits for review                          |
 | `BROADCAST_HELD`         | 403    | Broadcast used its unreviewed allowance; the remainder waits for review                                |
 | `ALL_SUPPRESSED`         | 422    | All recipients are on the suppression list                                                             |

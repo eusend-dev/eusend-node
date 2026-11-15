@@ -133,10 +133,11 @@ export interface BroadcastDetail extends Broadcast {
 
 export interface TestBroadcastOptions {
   /**
-   * Up to 5 addresses, each on a domain verified on your account. A test send delivers
-   * real mail without the paid-plan gate that `send()` carries, so it is restricted to
-   * inboxes you have already proved you control; anything else returns
-   * `DOMAIN_NOT_VERIFIED`.
+   * Up to 5 addresses, each a team member's own account email or on a domain verified on
+   * your account. A test send delivers real mail without the paid-plan gate that `send()`
+   * carries, so it is restricted to inboxes you have already proved you control; anything
+   * else returns `DOMAIN_NOT_VERIFIED`. Suppressed addresses are skipped and cost nothing;
+   * if every one is suppressed the call fails with `ALL_SUPPRESSED`.
    */
   to: string[]
 }
