@@ -560,6 +560,7 @@ await client.emails.send({
 await client.templates.list()
 await client.templates.get(templateId)
 await client.templates.update(templateId, { name: 'New name', subject: 'New subject' })
+const { data: html } = await client.templates.preview(templateId, { first_name: 'Alex' }) // rendered HTML
 await client.templates.delete(templateId)
 ```
 
@@ -577,7 +578,7 @@ const { data } = await client.webhooks.create({
   events: ['email.sent', 'email.delivered', 'email.bounced', 'email.complained'],
 })
 
-console.log(data?.secret) // signing secret — only returned once, store it securely
+console.log(data?.secret) // signing secret — store it securely; getSecret() reads it again
 ```
 
 Pass `'*'` in the events array to subscribe to all events.
@@ -615,6 +616,8 @@ await client.webhooks.get(webhookId) // includes recent deliveries
 await client.webhooks.update(webhookId, { events: ['email.bounced'] })
 await client.webhooks.update(webhookId, { enabled: true }) // re-enable a paused or auto-disabled endpoint
 await client.webhooks.test(webhookId) // send a signed webhook.test event
+await client.webhooks.getSecret(webhookId) // { secret }
+await client.webhooks.rotateSecret(webhookId) // new secret, effective immediately
 await client.webhooks.delete(webhookId)
 ```
 

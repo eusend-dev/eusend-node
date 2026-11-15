@@ -61,6 +61,10 @@ export interface CreateWebhookResponse extends Webhook {
   secret: string
 }
 
+export interface WebhookSecretResponse {
+  secret: string
+}
+
 export class Webhooks {
   constructor(private readonly client: Eusend) {}
 
@@ -87,6 +91,16 @@ export class Webhooks {
       events: options.events,
       enabled: options.enabled,
     })
+  }
+
+  /** The endpoint's current signing secret. */
+  getSecret(id: string): Promise<EusendResponse<WebhookSecretResponse>> {
+    return this.client.get<WebhookSecretResponse>(`/webhooks/${id}/secret`)
+  }
+
+  /** Replace the signing secret. Takes effect immediately — the previous secret stops verifying. */
+  rotateSecret(id: string): Promise<EusendResponse<CreateWebhookResponse>> {
+    return this.client.post<CreateWebhookResponse>(`/webhooks/${id}/rotate-secret`)
   }
 
   /** Send one signed `webhook.test` event to the endpoint. Works on a disabled endpoint. */

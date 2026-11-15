@@ -91,6 +91,17 @@ export class Templates {
     })
   }
 
+  /** Render the template with `variables` and return the resulting HTML. */
+  preview(id: string, variables?: Record<string, unknown>): Promise<EusendResponse<string>> {
+    const query = variables ? `?variables=${encodeURIComponent(JSON.stringify(variables))}` : ''
+    return this.client.fetchRequest<string>(
+      `/templates/${id}/preview${query}`,
+      { method: 'GET' },
+      {},
+      'text',
+    )
+  }
+
   delete(id: string): Promise<EusendResponse<Record<string, never>>> {
     return this.client.delete<Record<string, never>>(`/templates/${id}`)
   }
