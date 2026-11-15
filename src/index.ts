@@ -113,3 +113,5 @@ export type {
   SuppressionImportItem,
   SuppressionReason,
 } from './suppressions'
+
+export type { Reputation, ReputationState } from './reputation'

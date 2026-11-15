@@ -10,6 +10,7 @@ import { Templates } from './templates'
 import { Webhooks } from './webhooks'
 import { Broadcasts } from './broadcasts'
 import { Suppressions } from './suppressions'
+import { ReputationResource } from './reputation'
 
 const DEFAULT_BASE_URL = 'https://api.eusend.dev'
 const SDK_VERSION = '0.20.0'
@@ -36,6 +37,7 @@ export class Eusend {
   readonly webhooks: Webhooks
   readonly broadcasts: Broadcasts
   readonly suppressions: Suppressions
+  readonly reputation: ReputationResource
 
   constructor(key?: string, options?: EusendOptions) {
     const apiKey =
@@ -59,6 +61,7 @@ export class Eusend {
     this.webhooks = new Webhooks(this)
     this.broadcasts = new Broadcasts(this)
     this.suppressions = new Suppressions(this)
+    this.reputation = new ReputationResource(this)
   }
 
   async fetchRequest<T>(

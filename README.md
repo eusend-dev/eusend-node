@@ -496,6 +496,18 @@ const { data: csv } = await client.suppressions.export()
 // "email,reason,created_at\n..."
 ```
 
+## Reputation
+
+Your bounce and complaint rates exactly as the sending limits judge them: what counted, what did not, and how far you are from a halved daily limit or a pause. Not available to sending-only keys.
+
+```ts
+const { data } = await client.reputation.get()
+// data.state: 'healthy' | 'warning' | 'limited' | 'paused'
+if (data?.next?.bounces != null && data.next.bounces <= 3) {
+  console.warn(`${data.next.bounces} more bounces would move this account to ${data.next.state}`)
+}
+```
+
 ## Templates
 
 Templates let you define reusable email layouts with `{{variable}}` placeholders that are substituted at send time.
