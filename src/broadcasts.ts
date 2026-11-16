@@ -76,6 +76,7 @@ export interface UpdateBroadcastOptions {
 }
 
 export interface SendBroadcastOptions {
+  /** ISO 8601 send time, at most 30 days ahead. Omit to send immediately. */
   scheduledAt?: string
 }
 
