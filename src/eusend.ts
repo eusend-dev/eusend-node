@@ -13,7 +13,7 @@ import { Suppressions } from './suppressions'
 import { ReputationResource } from './reputation'
 
 const DEFAULT_BASE_URL = 'https://api.eusend.dev'
-const SDK_VERSION = '0.22.1'
+const SDK_VERSION = '0.22.2'
 
 export interface EusendOptions {
   baseUrl?: string
