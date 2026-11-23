@@ -14,7 +14,7 @@ import { ReputationResource } from './reputation'
 import { Inbound } from './inbound'
 
 const DEFAULT_BASE_URL = 'https://api.eusend.dev'
-const SDK_VERSION = '0.23.0'
+const SDK_VERSION = '0.24.0'
 
 export interface EusendOptions {
   baseUrl?: string
