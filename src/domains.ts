@@ -136,6 +136,8 @@ export class Domains {
    * Receive mail on a verified domain or a subdomain of it. Returns the MX record to publish;
    * mail starts arriving once it resolves. Not available to test keys.
    * Requires a paid plan or admin receiving grant. Disabled or held workspaces get 403 FORBIDDEN.
+   * A host whose first label is `send` is refused with 400: `send.<domain>` is the Return-Path
+   * host for bounces.
    */
   enableInbound(
     id: string,
