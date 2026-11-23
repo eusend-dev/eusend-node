@@ -81,6 +81,8 @@ export interface InboundEmail {
 }
 
 export interface ListInboundOptions {
+  /** Received time: desc (newest first, default) or asc (oldest first). Keep the same order while paging. */
+  order?: 'asc' | 'desc'
   /** 1–100, default 10. */
   limit?: number
   cursor?: string
@@ -134,6 +136,7 @@ export class Inbound {
     if (options.limit != null) params.set('limit', String(options.limit))
     if (options.cursor) params.set('cursor', options.cursor)
     if (options.to) params.set('to', options.to)
+    if (options.order) params.set('order', options.order)
     const qs = params.toString()
     const res = await this.client.get<{ data: InboundEmailListItem[]; next_cursor: string | null }>(
       qs ? `/inbound?${qs}` : '/inbound',

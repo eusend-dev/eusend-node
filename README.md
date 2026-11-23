@@ -240,7 +240,7 @@ the content with `inbound.get()`.
 const { data: address } = await client.inbound.address()
 // { host: '3e44228d8f38.eusend.app', address: 'anything@3e44228d8f38.eusend.app', status: 'active', active: true }
 
-const { data: page } = await client.inbound.list({ limit: 20 })
+const { data: page } = await client.inbound.list({ limit: 20, order: 'asc' })
 
 const { data: email } = await client.inbound.get(inboundEmailId)
 // { from, to, subject, text, html, headers, attachments, authentication, replyToEmailId, ... }
