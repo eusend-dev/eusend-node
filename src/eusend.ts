@@ -11,6 +11,7 @@ import { Webhooks } from './webhooks'
 import { Broadcasts } from './broadcasts'
 import { Suppressions } from './suppressions'
 import { ReputationResource } from './reputation'
+import { Inbound } from './inbound'
 
 const DEFAULT_BASE_URL = 'https://api.eusend.dev'
 const SDK_VERSION = '0.22.2'
@@ -38,6 +39,7 @@ export class Eusend {
   readonly broadcasts: Broadcasts
   readonly suppressions: Suppressions
   readonly reputation: ReputationResource
+  readonly inbound: Inbound
 
   constructor(key?: string, options?: EusendOptions) {
     const apiKey =
@@ -62,6 +64,7 @@ export class Eusend {
     this.broadcasts = new Broadcasts(this)
     this.suppressions = new Suppressions(this)
     this.reputation = new ReputationResource(this)
+    this.inbound = new Inbound(this)
   }
 
   async fetchRequest<T>(
@@ -71,7 +74,7 @@ export class Eusend {
     // Not every successful endpoint answers with JSON — the suppression export returns
     // CSV. Parsing that as JSON throws inside the try below, which would surface a
     // perfectly good download as "Network request failed".
-    parse: 'json' | 'text' = 'json',
+    parse: 'json' | 'text' | 'bytes' = 'json',
   ): Promise<EusendResponse<T>> {
     const headers: Record<string, string> = {
       Authorization: `Bearer ${this.apiKey}`,
@@ -99,11 +102,17 @@ export class Eusend {
         return { data: null, error, headers: responseHeaders }
       }
 
-      if (res.status === 204 || res.headers.get('content-length') === '0') {
+      if (parse !== 'bytes' && (res.status === 204 || res.headers.get('content-length') === '0')) {
         return { data: {} as T, error: null, headers: responseHeaders }
       }
 
-      const data = (parse === 'text' ? await res.text() : await res.json()) as T
+      const data = (
+        parse === 'bytes'
+          ? new Uint8Array(await res.arrayBuffer())
+          : parse === 'text'
+            ? await res.text()
+            : await res.json()
+      ) as T
       return { data, error: null, headers: responseHeaders }
     } catch {
       return {

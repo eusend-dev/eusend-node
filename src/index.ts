@@ -30,6 +30,8 @@ export type {
   DomainListItem,
   DomainStatus,
   DomainVerification,
+  DomainInbound,
+  EnableInboundOptions,
 } from './domains'
 
 export type {
@@ -116,3 +118,13 @@ export type {
 } from './suppressions'
 
 export type { Reputation, ReputationState } from './reputation'
+export type {
+  InboundAddress,
+  InboundAttachment,
+  InboundAuthResult,
+  InboundEmail,
+  InboundEmailListItem,
+  ListInboundOptions,
+  ListInboundResponse,
+  EmailReceivedEvent,
+} from './inbound'

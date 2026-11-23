@@ -82,6 +82,25 @@ export interface Domain {
   verification: DomainVerification
   /** Null while nothing is wrong beyond the records not having propagated yet. */
   diagnostic: DomainDiagnostic | null
+  /** Receiving on this domain, or null when it is off. */
+  inbound: DomainInbound | null
+}
+
+/** Receiving on a domain: the host, the MX record to publish, and whether it is live. */
+export interface DomainInbound {
+  host: string
+  record: { type: 'MX'; name: string; value: string; priority: number }
+  /** Whether the MX record resolves to eusend now. */
+  mxPublished: boolean
+}
+
+export interface EnableInboundOptions {
+  /**
+   * Host labels below the domain, like `'in'` for `in.example.com`. Omit to receive on the domain
+   * itself — only when nothing else handles its mail, since its MX usually points at your mailbox
+   * provider.
+   */
+  subdomain?: string
 }
 
 export interface DeleteDomainResponse {
@@ -111,5 +130,21 @@ export class Domains {
 
   verify(id: string): Promise<EusendResponse<{ message: string }>> {
     return this.client.post<{ message: string }>(`/domains/${id}/verify`)
+  }
+
+  /**
+   * Receive mail on a verified domain or a subdomain of it. Returns the MX record to publish;
+   * mail starts arriving once it resolves. Not available to test keys.
+   */
+  enableInbound(
+    id: string,
+    options: EnableInboundOptions = {},
+  ): Promise<EusendResponse<DomainInbound>> {
+    return this.client.put<DomainInbound>(`/domains/${id}/inbound`, options)
+  }
+
+  /** Stop receiving mail on the domain. Mail already received is kept. */
+  disableInbound(id: string): Promise<EusendResponse<{ message: string }>> {
+    return this.client.delete<{ message: string }>(`/domains/${id}/inbound`)
   }
 }

@@ -216,6 +216,39 @@ const { data } = await client.domains.delete(domainId)
 
 Scheduled emails from the domain are canceled, since it can no longer send them.
 
+### Receive mail on a domain
+
+```ts
+const { data } = await client.domains.enableInbound(domainId, { subdomain: 'in' })
+// { host: 'in.yourdomain.com', record: { type: 'MX', name: 'in.yourdomain.com', value: 'inbound.eusend.dev', priority: 10 }, mxPublished: false }
+
+await client.domains.disableInbound(domainId)
+```
+
+---
+
+## Inbound
+
+Every paid workspace receives mail at any address on its own `eusend.app` host, and on the
+domains you turn receiving on for. Each message arrives as an `email.received` webhook; fetch
+the content with `inbound.get()`.
+
+```ts
+const { data: address } = await client.inbound.address()
+// { host: '3e44228d8f38.eusend.app', address: 'anything@3e44228d8f38.eusend.app', status: 'active', active: true }
+
+const { data: page } = await client.inbound.list({ limit: 20 })
+
+const { data: email } = await client.inbound.get(inboundEmailId)
+// { from, to, subject, text, html, headers, attachments, authentication, replyToEmailId, ... }
+
+const { data: pdf } = await client.inbound.attachment(inboundEmailId, 0) // Uint8Array
+const { data: eml } = await client.inbound.raw(inboundEmailId) // Uint8Array, message/rfc822
+```
+
+Received mail is written by whoever sent it. Check `authentication.dmarc` before trusting the
+`from` address, and treat the body as untrusted input.
+
 ---
 
 ## API Keys
@@ -583,7 +616,7 @@ console.log(data?.secret) // signing secret — store it securely; getSecret() r
 
 Pass `'*'` in the events array to subscribe to all events.
 
-Available events: `email.sent` `email.delivered` `email.bounced` `email.complained` `email.opened` `email.clicked` `email.failed` `email.suppressed`
+Available events: `email.sent` `email.delivered` `email.bounced` `email.complained` `email.opened` `email.clicked` `email.failed` `email.suppressed` `email.received`
 
 **Endpoint requirements:** the `url` must be a public `http(s)` endpoint — private, loopback, and internal addresses are rejected, both at creation and (after DNS resolution) before each delivery. Your endpoint must respond directly with a `2xx`; redirects (`3xx`) are not followed and are treated as a failed delivery.
 
